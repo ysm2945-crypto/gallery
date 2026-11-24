@@ -158,15 +158,15 @@
   .weeks a { font-weight: 700; }
   .brand { font-weight: 500; }
 
-  /* 마우스 포인터 원: 파랑 (오브젝트 선 색과 동일) */
-  .fx-cur { background: #2747b5 !important; mix-blend-mode: normal !important; }
+  /* 마우스 포인터 원: 더스티핑크 (오브젝트 선 색과 동일) */
+  .fx-cur { background: #8a4a52 !important; mix-blend-mode: normal !important; }
   .fx-cur span { color: #ffffff; }
 
-  /* 링크 위 포인터: 글자를 덮지 않는 속 빈 파란 원 */
-  .fx-cur.link { background: transparent !important; border: 2px solid #2747b5; box-sizing: border-box; opacity: 1 !important; }
+  /* 링크 위 포인터: 글자를 덮지 않는 속 빈 더스티핑크 원 */
+  .fx-cur.link { background: transparent !important; border: 2px solid #8a4a52; box-sizing: border-box; opacity: 1 !important; }
 
-  /* GNB 위 포인터: 파란 원이 메뉴 위를 따라다니고, 글자는 원 위에 그대로 보인다 */
-  .gnb-ring { position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%; background: #2747b5; pointer-events: none; z-index: 0; opacity: 0; transition: width .28s cubic-bezier(.2,.7,.2,1), height .28s cubic-bezier(.2,.7,.2,1), opacity .2s; will-change: transform; }
+  /* GNB 위 포인터: 더스티핑크 원이 메뉴 위를 따라다니고, 글자는 원 위에 그대로 보인다 */
+  .gnb-ring { position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%; background: #8a4a52; pointer-events: none; z-index: 0; opacity: 0; transition: width .28s cubic-bezier(.2,.7,.2,1), height .28s cubic-bezier(.2,.7,.2,1), opacity .2s; will-change: transform; }
   .gnb-ring.on { opacity: 1; }
   .gnb-ring.big { width: 44px; height: 44px; }
   .gnb-in { position: relative; z-index: 1; }
@@ -176,8 +176,8 @@
   h1#def, .by, .hint, .eyebrow, .c dl, .go { position: relative; z-index: 301; }
   .gnb { z-index: 301; }
 
-  /* 링크(그 주 작업 보기 →) 위: GNB와 같은 속이 찬 파란 원으로 커짐. 글자는 원 위에 보임 */
-  .fx-cur.link { background: #2747b5 !important; border: 0 !important; width: 44px; height: 44px; opacity: 1 !important; }
+  /* 링크(그 주 작업 보기 →) 위: GNB와 같은 속이 찬 더스티핑크 원으로 커짐. 글자는 원 위에 보임 */
+  .fx-cur.link { background: #8a4a52 !important; border: 0 !important; width: 44px; height: 44px; opacity: 1 !important; }
 
   /* 로고(Sample Archive): GNB 우측 메뉴와 같은 서체 — 11px · 600 · 대문자 · 자간 .06em (모든 페이지 통일) */
   .brand, .gnb .brand, body[data-week] .gnb .brand { font-size: 11px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: .06em !important; line-height: 1 !important; }
@@ -224,7 +224,7 @@
   $("def").textContent = String(G.definition || "");
   $("by").textContent = G.author ? String(G.author) : "";
   document.title = (G.author ? G.author + " · " : "") + "취향 갤러리";
-  const BLUE = { plate: "#ffffff", hi: "#2747b5", edge: "#4a67c4", mid: "#8ea0dc", lo: "#cfd7f3" };
+  const BLUE = { plate: "#ffffff", hi: "#b5767e", edge: "#c08088", mid: "#d4aab0", lo: "#e8d4d7" };
   const colorQuery = (c) => {
     if (!c || typeof c !== "object") return "";
     const ok = {};
