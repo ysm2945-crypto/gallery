@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passage — Photography</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  img { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  p, h1, h2, h3 { margin: 0; font-weight: inherit; font-size: inherit; }
+
+  .muted { color: var(--color-text-muted); }
+  .small { font-size: var(--text-small); }
+  .col-indent {
+    --cols: var(--grid-cols);
+    text-indent: calc((100% - (var(--cols) - 1) * var(--gutter)) / var(--cols) * var(--indent, 0) + var(--indent, 0) * var(--gutter));
+  }
+
+  /* Header */
+  .header {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    padding-top: 1.6rem;
+    mix-blend-mode: difference;
+  }
+  .header nav { display: flex; gap: 2rem; }
+  .header .right { text-align: right; }
+
+  /* Hero */
+  .hero { padding-top: 15rem; }
+  .hero h1 { grid-column: 1 / -1; --indent: 1; }
+  .hero-meta { margin-top: 3rem; }
+
+  /* Media */
+  .media { position: relative; overflow: hidden; background: #0d0d0d; }
+  .media img {
+    width: 100%; height: 100%; object-fit: cover;
+    opacity: 0; transition: opacity var(--dur-fade) ease-out, transform 1.2s var(--ease-out-expo);
+  }
+  .media.is-loaded img { opacity: 1; }
+  .media:hover img { transform: scale(1.02); }
+  .caption { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.6rem; font-size: var(--text-small); }
+
+  /* Chapter (Hands / Road / Sky) */
+  .chapter { margin-top: 18rem; }
+  .chapter > * { grid-column: 1 / -1; }
+  .chapter-head { padding-bottom: 3rem; border-bottom: 1px solid var(--color-border); }
+  .chapter-head > * { grid-column: 1 / -1; }
+  .chapter-head .num { display: block; margin-bottom: 1rem; }
+  .chapter-head .lead { --indent: 1; }
+  .chapter .feature { margin: 7.5rem 0 0; cursor: zoom-in; }
+  .chapter .feature .media { grid-column: 1 / -1; aspect-ratio: 4 / 5; }
+  .chapter .feature .note { margin-top: 1.2rem; grid-column: 1 / -1; }
+
+  /* Sub-gallery reused per chapter */
+  .gallery { margin-top: 7.5rem; row-gap: 7.5rem; }
+  .gallery figure { margin: 0; cursor: zoom-in; }
+  .g1 { grid-column: 1 / -1; } .g1 .media { aspect-ratio: 16 / 9; }
+  .g2 { grid-column: 1 / 3; } .g2 .media { aspect-ratio: 4 / 3; }
+  .g3 { grid-column: 3 / 5; margin-top: 12rem !important; } .g3 .media { aspect-ratio: 4 / 3; }
+  .g4 { grid-column: 1 / -1; } .g4 .media { aspect-ratio: 3 / 2; }
+  .g5 { grid-column: 2 / 5; } .g5 .media { aspect-ratio: 3 / 2; }
+
+  /* Project index */
+  .index { margin-top: 20rem; }
+  .index-head { padding-bottom: 1.2rem; border-bottom: 1px solid var(--color-border); }
+  .row {
+    padding: 1.2rem 0; border-bottom: 1px solid var(--color-border);
+    align-items: baseline; cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-default);
+  }
+  .index-list:hover .row { color: var(--color-text-muted); }
+  .index-list .row:hover { color: var(--color-text); }
+  .row .nums { display: flex; gap: 2.4rem; }
+  .preview {
+    position: fixed; z-index: 40; pointer-events: none;
+    width: 22rem; aspect-ratio: 4 / 3; overflow: hidden;
+    opacity: 0; transform: translate(-50%, -50%) scale(.96);
+    transition: opacity .3s var(--ease-out-expo), transform .5s var(--ease-out-expo);
+  }
+  .preview.is-on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .preview img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Info */
+  .info { margin-top: 20rem; }
+  .info .lead { grid-column: 1 / -1; --indent: 1; }
+  .info .details { grid-column: 1 / -1; margin-top: 5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem var(--gutter); }
+  .info .details h3 { margin-bottom: 0.6rem; }
+
+  /* Footer */
+  .footer { margin-top: 20rem; padding-bottom: 1.2rem; align-items: end; }
+  .footer ul { display: flex; flex-direction: column; align-items: flex-start; }
+  .f-copy { grid-column: 1 / 3; }
+  .f-social { grid-column: 3 / 5; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--color-bg);
+    display: grid; grid-template-rows: auto 1fr auto;
+    padding: 1.6rem var(--page-margin) 1.2rem;
+    opacity: 0; visibility: hidden;
+    transition: opacity .4s var(--ease-out-expo), visibility 0s .4s;
+  }
+  .lightbox.is-open { opacity: 1; visibility: visible; transition: opacity .4s var(--ease-out-expo); }
+  .lightbox .bar { display: flex; justify-content: space-between; align-items: baseline; }
+  .lightbox .stage { display: flex; align-items: center; justify-content: center; min-height: 0; padding: 2rem 0; }
+  .lightbox .stage img { max-height: 100%; width: auto; object-fit: contain; }
+  .lightbox .controls { display: flex; gap: 2rem; }
+
+  @media (min-width: 650px) {
+    .hero { padding-top: 21rem; }
+    .hero h1 { --indent: 3; grid-column: 1 / 13; }
+    .hero-meta { grid-column: 4 / 8; }
+    .hero-meta-2 { grid-column: 9 / 12; margin-top: 3rem; }
+    .chapter-head .lead { grid-column: 1 / 11; --indent: 3; }
+    .chapter .feature .media { grid-column: 3 / 13; aspect-ratio: 16 / 9; }
+    .chapter .feature .note { grid-column: 3 / 8; margin-top: 1.6rem; }
+    .row .r-name { grid-column: 1 / 5; }
+    .row .nums { grid-column: 5 / 11; }
+    .row .r-year { grid-column: 13 / 15; text-align: right; }
+    .row .r-kind { grid-column: 11 / 13; }
+    .g1 { grid-column: 1 / 10; }
+    .g2 { grid-column: 11 / 15; margin-top: 12rem !important; }
+    .g3 { grid-column: 3 / 7; margin-top: 0 !important; }
+    .g4 { grid-column: 8 / 15; margin-top: 6rem !important; }
+    .g5 { grid-column: 4 / 11; }
+    .info .lead { grid-column: 1 / 11; --indent: 3; }
+    .info .details { grid-column: 4 / 14; grid-template-columns: repeat(3, 1fr); }
+    .f-copy { grid-column: 1 / 5; }
+    .f-social { grid-column: 5 / 8; }
+    .f-social-2 { grid-column: 8 / 11; }
+    .f-right { grid-column: 13 / 15; text-align: right; }
+  }
+  @media (max-width: 649px) {
+    .hide-s { display: none !important; }
+    .row .r-name { grid-column: 1 / 3; }
+    .row .nums { grid-column: 3 / 5; justify-content: flex-end; gap: 1.2rem; }
+    .row .r-year, .row .r-kind { display: none; }
+    .hero-meta, .hero-meta-2 { grid-column: 1 / -1; }
+    .f-social-2 { grid-column: 3 / 5; }
+    .f-right { grid-column: 1 / -1; margin-top: 6rem; }
+    .preview { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="site-max site-grid">
+    <a href="#top" class="h-pill" style="grid-column: span 2;">Passage</a>
+    <nav class="hide-s" style="grid-column: 5 / 11;">
+      <a href="#hands" class="h-pill">Hands</a>
+      <a href="#road" class="h-pill">Road</a>
+      <a href="#sky" class="h-pill">Sky</a>
+      <a href="#info" class="h-pill">Info</a>
+    </nav>
+    <div class="right" style="grid-column: -3 / -1;"><span id="clock">00:00</span> Seoul</div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero site-max site-grid">
+    <h1 class="t-display col-indent">Hands hold on. Roads carry forward. Sky lets go — eighteen frames in three parts.</h1>
+    <p class="hero-meta muted">A photo essay in three chapters — Hands, Road, Sky — laid out with the design system extracted from gilhuybrecht.com.</p>
+    <p class="hero-meta-2 muted hide-s">Scroll ↓</p>
+  </section>
+
+  <section class="chapter site-max site-grid" id="hands">
+    <div class="chapter-head site-grid">
+      <span class="num small muted">01 — Hands</span>
+      <p class="lead t-display col-indent">What we touch, hold, and make.</p>
+    </div>
+    <figure class="feature site-grid" data-lb="0" style="cursor: zoom-in;">
+      <div class="media"><img src="images/hands/hands-on-table.avif" alt="테이블 위에 놓인 손" fetchpriority="high"></div>
+      <figcaption class="note"><p>Hands on the Table</p><p class="muted">Still Life, 2026</p></figcaption>
+    </figure>
+    <div class="gallery site-grid" id="gallery-hands"></div>
+  </section>
+
+  <section class="chapter site-max site-grid" id="road">
+    <div class="chapter-head site-grid">
+      <span class="num small muted">02 — Road</span>
+      <p class="lead t-display col-indent">Where we go, alone or together.</p>
+    </div>
+    <figure class="feature site-grid" data-lb="6" style="cursor: zoom-in;">
+      <div class="media"><img src="images/road/empty-road.avif" alt="텅 빈 도로" loading="lazy"></div>
+      <figcaption class="note"><p>The Empty Road</p><p class="muted">Landscape, 2025</p></figcaption>
+    </figure>
+    <div class="gallery site-grid" id="gallery-road"></div>
+  </section>
+
+  <section class="chapter site-max site-grid" id="sky">
+    <div class="chapter-head site-grid">
+      <span class="num small muted">03 — Sky</span>
+      <p class="lead t-display col-indent">What waits above, once the road runs out.</p>
+    </div>
+    <figure class="feature site-grid" data-lb="12" style="cursor: zoom-in;">
+      <div class="media"><img src="images/sky/sunset-sky.avif" alt="노을 지는 하늘" loading="lazy"></div>
+      <figcaption class="note"><p>Sunset Sky</p><p class="muted">Landscape, 2024</p></figcaption>
+    </figure>
+    <div class="gallery site-grid" id="gallery-sky"></div>
+  </section>
+
+  <section class="index site-max" id="index">
+    <div class="site-grid index-head small muted">
+      <span style="grid-column: 1 / 3;">Index</span>
+      <span class="hide-s" style="grid-column: 11 / 13;">Chapter</span>
+      <span style="grid-column: -3 / -1; text-align: right;">18 frames</span>
+    </div>
+    <ul class="index-list" id="indexList"></ul>
+  </section>
+
+  <section class="info site-max site-grid" id="info">
+    <p class="lead t-display col-indent">Three chapters, one arc — from what we hold, through where we walk, to what we can't touch at all.</p>
+    <div class="details">
+      <div><h3 class="muted">System</h3><p>1rem = 10px at 390 / 1500px<br>4 / 14 column grid<br>Gutter 1.4rem</p></div>
+      <div><h3 class="muted">Type</h3><p>One weight, 500<br>Display 70 / 0.9<br>Body 17 / 1.11</p></div>
+      <div><h3 class="muted">Motion</h3><p>Ease-out expo<br>Underline 750ms<br>Image fade 1s</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer site-max site-grid">
+  <div class="f-copy">©2026 Passage</div>
+  <ul class="f-social"><li><a class="h-pill" href="#">Instagram</a></li><li><a class="h-pill" href="#">Unsplash</a></li></ul>
+  <ul class="f-social-2"><li><a class="h-pill" href="#">Savee</a></li><li><a class="h-pill" href="#">Newsletter</a></li></ul>
+  <div class="f-right"><a class="h-pill" href="#top">Back to top ↑</a></div>
+</footer>
+
+<div class="preview" id="preview"><img alt=""></div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="이미지 보기">
+  <div class="bar">
+    <span id="lbTitle"></span>
+    <span id="lbCount" class="muted"></span>
+    <button class="h-pill" id="lbClose">Close</button>
+  </div>
+  <div class="stage"><img id="lbImg" alt=""></div>
+  <div class="bar">
+    <span id="lbCredit" class="muted small"></span>
+    <div class="controls">
+      <button class="h-pill" id="lbPrev">Prev</button>
+      <button class="h-pill" id="lbNext">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PHOTOS = [
+    // Hands (0-5)
+    { src: 'images/hands/hands-on-table.avif', title: 'Hands on the Table', kind: 'Hands', year: 2026, alt: '테이블 위에 놓인 손' },
+    { src: 'images/hands/working-hands.avif', title: 'Working Hands', kind: 'Hands', year: 2026, alt: '일하는 손' },
+    { src: 'images/hands/child-hand.avif', title: "A Child's Hand", kind: 'Hands', year: 2026, alt: '아이의 손' },
+    { src: 'images/hands/holding-hands.avif', title: 'Holding Hands', kind: 'Hands', year: 2026, alt: '맞잡은 두 손' },
+    { src: 'images/hands/hands-writing.avif', title: 'Hands Writing', kind: 'Hands', year: 2026, alt: '글을 쓰는 손' },
+    { src: 'images/hands/old-hands.avif', title: 'Old Hands', kind: 'Hands', year: 2026, alt: '나이 든 손' },
+    // Road (6-11)
+    { src: 'images/road/empty-road.avif', title: 'The Empty Road', kind: 'Road', year: 2025, alt: '텅 빈 도로' },
+    { src: 'images/road/country-road.avif', title: 'Country Road', kind: 'Road', year: 2025, alt: '시골길' },
+    { src: 'images/road/alley.avif', title: 'Alley', kind: 'Road', year: 2025, alt: '골목길' },
+    { src: 'images/road/city-street.avif', title: 'City Street', kind: 'Road', year: 2025, alt: '도시의 거리' },
+    { src: 'images/road/people-walking-street.avif', title: 'People Walking the Street', kind: 'Road', year: 2025, alt: '거리를 걷는 사람들' },
+    { src: 'images/road/road-at-night.avif', title: 'Road at Night', kind: 'Road', year: 2025, alt: '밤의 도로' },
+    // Sky (12-17)
+    { src: 'images/sky/sunset-sky.avif', title: 'Sunset Sky', kind: 'Sky', year: 2024, alt: '노을 지는 하늘' },
+    { src: 'images/sky/sky-between-buildings.avif', title: 'Sky Between Buildings', kind: 'Sky', year: 2024, alt: '건물 사이의 하늘' },
+    { src: 'images/sky/blue-sky.avif', title: 'Blue Sky', kind: 'Sky', year: 2024, alt: '맑은 하늘' },
+    { src: 'images/sky/cloudy-sky.avif', title: 'Cloudy Sky', kind: 'Sky', year: 2024, alt: '구름 낀 하늘' },
+    { src: 'images/sky/night-sky.avif', title: 'Night Sky', kind: 'Sky', year: 2024, alt: '밤하늘' },
+    { src: 'images/sky/overcast-sky.avif', title: 'Overcast Sky', kind: 'Sky', year: 2024, alt: '흐린 하늘' },
+  ];
+
+  // Chapter galleries: feature is index 0/6/12, remaining 5 fill g1..g5
+  const CHAPTERS = [
+    { id: 'gallery-hands', indices: [1, 2, 3, 4, 5] },
+    { id: 'gallery-road', indices: [7, 8, 9, 10, 11] },
+    { id: 'gallery-sky', indices: [13, 14, 15, 16, 17] },
+  ];
+  CHAPTERS.forEach(({ id, indices }) => {
+    const el = document.getElementById(id);
+    indices.forEach((idx, n) => {
+      const p = PHOTOS[idx];
+      const fig = document.createElement('figure');
+      fig.className = 'g' + (n + 1);
+      fig.dataset.lb = idx;
+      fig.innerHTML = `
+        <div class="media"><img src="${p.src}" alt="${p.alt}" loading="lazy"></div>
+        <figcaption class="caption"><span>${String(idx + 1).padStart(2, '0')} — ${p.title}</span><span class="muted">${p.kind}</span></figcaption>`;
+      el.appendChild(fig);
+    });
+  });
+
+  // Index rows
+  const list = document.getElementById('indexList');
+  PHOTOS.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.className = 'row site-grid';
+    li.dataset.lb = i;
+    li.innerHTML = `
+      <span class="r-name"><span class="uline">${p.title}</span></span>
+      <span class="nums">${'<span>' + String(i + 1).padStart(2, '0') + '</span>'}</span>
+      <span class="r-kind">${p.kind}</span>
+      <span class="r-year">${p.year}</span>`;
+    list.appendChild(li);
+  });
+
+  // Hover preview follows the cursor
+  const preview = document.getElementById('preview');
+  const previewImg = preview.querySelector('img');
+  list.addEventListener('mousemove', e => {
+    const row = e.target.closest('.row');
+    if (!row) return;
+    if (previewImg.dataset.i !== row.dataset.lb) {
+      previewImg.dataset.i = row.dataset.lb;
+      previewImg.src = PHOTOS[row.dataset.lb].src;
+    }
+    preview.style.left = e.clientX + 'px';
+    preview.style.top = e.clientY + 'px';
+    preview.classList.add('is-on');
+    row.querySelector('.uline').classList.add('is-active');
+  });
+  list.addEventListener('mouseout', e => {
+    const row = e.target.closest('.row');
+    if (row && !row.contains(e.relatedTarget)) row.querySelector('.uline').classList.remove('is-active');
+    if (!list.contains(e.relatedTarget)) preview.classList.remove('is-on');
+  });
+
+  // Fade images in once loaded
+  function wireFade(img) {
+    const done = () => img.parentElement.classList.add('is-loaded');
+    img.complete && img.naturalWidth ? done() : img.addEventListener('load', done);
+  }
+  document.querySelectorAll('.media img').forEach(wireFade);
+
+  // Lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  let current = 0;
+  function show(i) {
+    current = (i + PHOTOS.length) % PHOTOS.length;
+    const p = PHOTOS[current];
+    lbImg.src = p.src;
+    lbImg.alt = p.alt;
+    document.getElementById('lbTitle').textContent = p.title;
+    document.getElementById('lbCount').textContent = `${current + 1} / ${PHOTOS.length}`;
+    document.getElementById('lbCredit').textContent = `${p.kind} — ${p.year}`;
+  }
+  function open(i) { show(i); lb.classList.add('is-open'); preview.classList.remove('is-on'); }
+  function close() { lb.classList.remove('is-open'); }
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-lb]');
+    if (t && !lb.contains(t)) open(+t.dataset.lb);
+  });
+  document.getElementById('lbClose').onclick = close;
+  document.getElementById('lbPrev').onclick = () => show(current - 1);
+  document.getElementById('lbNext').onclick = () => show(current + 1);
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('is-open')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(current - 1);
+    if (e.key === 'ArrowRight') show(current + 1);
+  });
+
+  // Clock
+  const clock = document.getElementById('clock');
+  const tick = () => clock.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul' });
+  tick(); setInterval(tick, 10000);
+</script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>양서윤 — 나의 취향 아카이브</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="보이지 않는 곳의 디테일까지, 나는 나의 취향으로 고른다.">
+<meta property="og:title" content="양서윤 — 나의 취향 아카이브">
+<meta property="og:description" content="보이지 않는 곳의 디테일까지, 나는 나의 취향으로 고른다.">
+<meta property="og:image" content="https://grand-gelato-5c0921.netlify.app/assets/img1.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Figtree:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;700&family=Pinyon+Script&family=Cormorant+SC:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css?v=28">
+</head>
+<body>
+
+<!-- 사진 선명하게 — 작은 원본이 늘어날 때 흐려지는 것을 줄인다 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="sharpen" color-interpolation-filters="sRGB"><feConvolveMatrix order="3" preserveAlpha="true" kernelMatrix="0 -0.6 0 -0.6 3.4 -0.6 0 -0.6 0"/></filter></svg>
+
+<!-- 떠 있는 알약 메뉴 — 7주: 다섯 칸(시선 · 사람 · 공간 · 물건 · 기준) -->
+<header class="nav-wrap">
+  <nav class="pill-nav" aria-label="장">
+    <a class="logo" href="#top"><span class="logo-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>양서윤</a>
+    <div class="seg"><a href="#gaze" class="is-on">시선</a><a href="#people">사람</a><a href="#space">공간</a><a href="#objects">물건</a><a href="#criteria">기준</a></div>
+  </nav>
+</header>
+
+<main>
+  <!-- ① 첫 화면 — 관점 한 문장(7주), 원형으로 도는 글자, 아래 둥근 화면에 3장 공간 사진이 영상처럼 흐른다 -->
+  <section class="hero" id="top">
+    <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+      <defs><path id="ringPath" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+      <text><textPath href="#ringPath" textLength="486" lengthAdjust="spacing">LACE · RIBBONS · FLORALS · GINGHAM · SUNLIGHT · ROSES · </textPath></text>
+    </svg>
+    <p class="eyebrow">YANG SEOYUN · 나의 취향 아카이브</p>
+    <h1 class="serif">보이지 않는 곳의 디테일까지,<br><em>나는 나의 취향으로 고른다.</em></h1>
+
+    <div class="reel-card">
+      <div class="reel" aria-hidden="true">
+        <img src="assets/img1.jpg" alt=""><img src="assets/img4.jpg" alt=""><img src="assets/img2.jpg" alt=""><img src="assets/img3.jpg" alt=""><img src="assets/img5.jpg" alt="">
+      </div>
+      <!-- 흐르는 글자 — 왼쪽에서는 옅은 글자로 흘러와 가운데 아래 소리 막대를 지나면 짙은 띠 위 흰 글자가 된다 -->
+      <svg class="ribbon" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+          <path id="wave" d="M-200,70 C120,40 380,262 600,262 S1020,90 1400,40"/>
+          <clipPath id="cutL"><rect x="-400" y="0" width="1000" height="320"/></clipPath>
+          <clipPath id="cutR"><rect x="600" y="0" width="1000" height="320"/></clipPath>
+        </defs>
+        <g clip-path="url(#cutL)">
+          <text class="rb-raw"><textPath href="#wave" class="rb-tp">Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. </textPath></text>
+        </g>
+        <g clip-path="url(#cutR)">
+          <use href="#wave" class="rb-band"/>
+          <text class="rb-clean"><textPath href="#wave" class="rb-tp">Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. </textPath></text>
+        </g>
+        <g class="rb-pill" transform="translate(600 262)">
+          <rect x="-74" y="-27" width="148" height="54" rx="27"/>
+          <g class="rb-bars"><rect x="-44" y="-9" width="4" height="18" rx="2"/><rect x="-33" y="-14" width="4" height="28" rx="2"/><rect x="-22" y="-8" width="4" height="16" rx="2"/><rect x="-11" y="-16" width="4" height="32" rx="2"/><rect x="0" y="-10" width="4" height="20" rx="2"/><rect x="11" y="-15" width="4" height="30" rx="2"/><rect x="22" y="-7" width="4" height="14" rx="2"/><rect x="33" y="-13" width="4" height="26" rx="2"/><rect x="44" y="-9" width="4" height="18" rx="2"/></g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ② 들어가는 말 — 짙은 면 위 네 장의 폴더(누르면 그 장으로). 폴더 무늬는 li의 f-sky·f-butter·f-pink·f-plaid -->
+  <section class="panel panel-dark" id="intro">
+    <p class="eyebrow light">들어가는 말</p>
+    <!-- 폴더 무늬 — 줄무늬 · 물방울 둘 · 체크, 그리고 네 폴더 공통 볼록 음영 -->
+    <svg class="fd-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+      <pattern id="pt-stripe" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#f7f9fb"/><rect width="6" height="12" fill="#d3e6f1"/></pattern>
+      <pattern id="pt-dot-butter" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#f5eac8"/><circle cx="3.5" cy="3.5" r="1.4" fill="#a59a8f"/><circle cx="10.5" cy="10.5" r="1.4" fill="#a59a8f"/></pattern>
+      <pattern id="pt-dot-pink" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#f3dce1"/><circle cx="3" cy="3" r="1.2" fill="#5a2e2a"/><circle cx="9" cy="9" r="1.2" fill="#5a2e2a"/></pattern>
+      <pattern id="pt-plaid" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="20" height="20" fill="#f6efe9"/><rect width="8" height="8" fill="#f1d8dc" opacity=".8"/><rect y="8" width="20" height="4" fill="#bfae9e" opacity=".45"/><rect x="8" width="4" height="20" fill="#bfae9e" opacity=".45"/><rect y="16" width="20" height="1" fill="#a8968a" opacity=".4"/><rect x="16" width="1" height="20" fill="#a8968a" opacity=".4"/></pattern>
+      <linearGradient id="fd-shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#5a3a33" stop-opacity=".1"/></linearGradient>
+    </defs></svg>
+    <ul class="arc-index">
+      <li class="f-sky"><a href="#gaze">
+        <svg class="folder" viewBox="0 0 120 96" aria-hidden="true"><path class="fd-back" d="M8 14a6 6 0 0 1 6-6h30l8 8h54a6 6 0 0 1 6 6v60a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z"/><rect x="8" y="24" width="104" height="64" rx="9" fill="url(#pt-stripe)"/><rect class="fd-shade" x="8" y="24" width="104" height="64" rx="9" fill="url(#fd-shade)"/><rect class="fd-rim" x="9" y="25" width="102" height="62" rx="8"/></svg>
+        <span class="ic-k">1장 시선</span><b class="serif">저마다의 하늘, 서로의 손, 각자의 길</b></a></li>
+      <li class="f-butter"><a href="#people">
+        <svg class="folder" viewBox="0 0 120 96" aria-hidden="true"><path class="fd-back" d="M8 14a6 6 0 0 1 6-6h30l8 8h54a6 6 0 0 1 6 6v60a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z"/><rect x="8" y="24" width="104" height="64" rx="9" fill="url(#pt-dot-butter)"/><rect class="fd-shade" x="8" y="24" width="104" height="64" rx="9" fill="url(#fd-shade)"/><rect class="fd-rim" x="9" y="25" width="102" height="62" rx="8"/></svg>
+        <span class="ic-k">2장 사람</span><b class="serif">우리 엄마</b></a></li>
+      <li class="f-pink"><a href="#space">
+        <svg class="folder" viewBox="0 0 120 96" aria-hidden="true"><path class="fd-back" d="M8 14a6 6 0 0 1 6-6h30l8 8h54a6 6 0 0 1 6 6v60a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z"/><rect x="8" y="24" width="104" height="64" rx="9" fill="url(#pt-dot-pink)"/><rect class="fd-shade" x="8" y="24" width="104" height="64" rx="9" fill="url(#fd-shade)"/><rect class="fd-rim" x="9" y="25" width="102" height="62" rx="8"/></svg>
+        <span class="ic-k">3장 공간</span><b class="serif">머물고 싶은 다정한 방</b></a></li>
+      <li class="f-plaid"><a href="#objects">
+        <svg class="folder" viewBox="0 0 120 96" aria-hidden="true"><path class="fd-back" d="M8 14a6 6 0 0 1 6-6h30l8 8h54a6 6 0 0 1 6 6v60a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z"/><rect x="8" y="24" width="104" height="64" rx="9" fill="url(#pt-plaid)"/><rect class="fd-shade" x="8" y="24" width="104" height="64" rx="9" fill="url(#fd-shade)"/><rect class="fd-rim" x="9" y="25" width="102" height="62" rx="8"/></svg>
+        <span class="ic-k">4장 물건</span><b class="serif">매일 고르는 물건 다섯&nbsp;개</b></a></li>
+    </ul>
+  </section>
+
+  <!-- ③ 1장 시선 — 4주 저마다의 하늘, 서로의 손, 각자의 길 (weeks/04/site) -->
+  <section class="sec" id="gaze">
+    <p class="eyebrow">1장 시선</p>
+    <h2 class="serif big center">저마다의 하늘, 서로의 손, 각자의 길</h2>
+
+    <div class="gz-group">
+      <div class="gz-head"><span class="num">01</span><h3 class="serif">하늘</h3><p lang="en">What waits above, once the road runs out.</p></div>
+      <div class="gz-grid">
+        <figure><div class="media"><img src="assets/w04_sky_01.avif" width="1169" height="780" alt="맑은 하늘" loading="lazy"></div><figcaption>맑은 하늘</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_sky_02.avif" width="1170" height="780" alt="구름 낀 하늘" loading="lazy"></div><figcaption>구름 낀 하늘</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_sky_03.avif" width="1332" height="749" alt="밤하늘" loading="lazy"></div><figcaption>밤하늘</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_sky_04.avif" width="776" height="947" alt="흐린 하늘" loading="lazy"></div><figcaption>흐린 하늘</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_sky_05.avif" width="687" height="1031" alt="건물 사이의 하늘" loading="lazy"></div><figcaption>건물 사이의 하늘</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="gz-group">
+      <div class="gz-head"><span class="num">02</span><h3 class="serif">손</h3><p lang="en">What we touch, hold, and make.</p></div>
+      <div class="gz-grid">
+        <figure><div class="media"><img src="assets/w04_hands_01.avif" width="1169" height="780" alt="아이의 손" loading="lazy"></div><figcaption>아이의 손</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_hands_02.avif" width="687" height="1031" alt="테이블 위에 놓인 손" loading="lazy"></div><figcaption>테이블 위에 놓인 손</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_hands_03.avif" width="1170" height="780" alt="글을 쓰는 손" loading="lazy"></div><figcaption>글을 쓰는 손</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_hands_04.avif" width="687" height="1031" alt="맞잡은 두 손" loading="lazy"></div><figcaption>맞잡은 두 손</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_hands_05.avif" width="1170" height="780" alt="나이 든 손" loading="lazy"></div><figcaption>나이 든 손</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="gz-group">
+      <div class="gz-head"><span class="num">03</span><h3 class="serif">길</h3><p lang="en">Where we go, alone or together.</p></div>
+      <div class="gz-grid">
+        <figure><div class="media"><img src="assets/w04_road_01.avif" width="687" height="1031" alt="골목길" loading="lazy"></div><figcaption>골목길</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_road_02.avif" width="1171" height="781" alt="도시의 거리" loading="lazy"></div><figcaption>도시의 거리</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_road_03.avif" width="1169" height="781" alt="시골길" loading="lazy"></div><figcaption>시골길</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_road_04.avif" width="1170" height="780" alt="텅 빈 도로" loading="lazy"></div><figcaption>텅 빈 도로</figcaption></figure>
+        <figure><div class="media"><img src="assets/w04_road_05.avif" width="687" height="1031" alt="거리를 걷는 사람들" loading="lazy"></div><figcaption>거리를 걷는 사람들</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 2장 사람 — 5주 우리 엄마 (weeks/05/02_plan.md · weeks/05/site) -->
+  <section class="sec" id="people">
+    <p class="eyebrow">2장 사람</p>
+    <h2 class="serif big center">우리 엄마</h2>
+    <p class="sub">엄마는 어디에 있든 그 순간을 즐길 줄 아는 사람이다.</p>
+    <div class="arc-lead"><p>엄마는 특별한 날을 혼자 보내지 않는다.</p><p>가족과 함께 순간을 즐기고, 그 추억을 오래 간직하는 사람이다.</p></div>
+    <div class="rooms">
+      <article class="room">
+        <figure class="media"><img src="assets/w05_mom_1.jpg" width="3024" height="4032" alt="이유 1 근거 사진" loading="lazy"></figure>
+        <div class="room-t" data-label="이유 1"><span class="num">01</span><h3 class="serif">새로운 곳에서 찾는 즐거움</h3><p>가족여행에서 주변 풍경을 즐기며 편안하게 앉아 있는 엄마</p><p class="arc-read">엄마는 새로운 장소에 가는 것을 좋아하고, 여행지에서 가족들과 함께하는 순간을 자연스럽게 즐긴다.</p></div>
+      </article>
+      <article class="room">
+        <figure class="media"><img src="assets/w05_mom_2.jpg" width="1080" height="1440" alt="이유 2 근거 사진" loading="lazy"></figure>
+        <div class="room-t" data-label="이유 2"><span class="num">02</span><h3 class="serif">오래 간직하는 것</h3><p>아기자기하게 모인 장식품들 앞에서 사진을 찍는 엄마</p><p class="arc-read">엄마는 작은 소품이나 추억이 담긴 물건을 소중하게 생각하는 사람이다.</p></div>
+      </article>
+      <article class="room">
+        <figure class="media"><img src="assets/w05_mom_3.jpg" width="3024" height="4032" alt="이유 3 근거 사진" loading="lazy"></figure>
+        <div class="room-t" data-label="이유 3"><span class="num">03</span><h3 class="serif">가족과 함께하는 시간</h3><p>엄마의 생일날 생일 케이크 앞에서 가족들과 시간을 보내는 엄마의 모습</p><p class="arc-read">엄마는 생일 같은 특별한 날에 가족과 함께 추억을 만드는 것을 좋아한다.</p></div>
+      </article>
+    </div>
+    <div class="arc-take"><span class="ic-k">가져올 한 가지</span><p class="serif">특별한 날을 사람들과 함께 나누는 습관</p></div>
+  </section>
+
+  <!-- ⑤ 3장 공간 — 6주 「다정한 방」 (weeks/06/site 그대로) · 짙은 면 — 다섯 장에 담긴 결이 로고 띠처럼 흐른다 -->
+  <section class="panel panel-dark" id="space">
+    <p class="eyebrow light">3장 공간</p>
+    <h2 class="serif big light center arc-ch">작고 다정한 것들로,<br><em>나의 방을 채운다.</em></h2>
+    <p class="eyebrow light">다섯 장에 담긴 취향</p>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Lace</span><span>Ribbons</span><span>Pink Cupboards</span><span>Gingham</span><span>Rose Trees</span><span>Ruffled Curtains</span><span>Hearts</span><span>Wooden Sills</span>
+        <span>Lace</span><span>Ribbons</span><span>Pink Cupboards</span><span>Gingham</span><span>Rose Trees</span><span>Ruffled Curtains</span><span>Hearts</span><span>Wooden Sills</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3장 · 소개 — 짙은 장밋빛 면, 가운데 큰 문장, 사진 카드 + 작은 카드 셋 -->
+  <section class="panel panel-berry" id="s1">
+    <h2 class="serif big">부드러운 색이 <em>겹겹이</em> 쌓인 곳</h2>
+    <p class="sub">채도를 낮춘 분홍과 하늘색, 크림색. 손끝에 닿을 듯한 천의 결, 그리고 구석구석 놓인 작은 장식들.</p>
+    <div class="intro-grid">
+      <figure class="media intro-fig"><img src="assets/img4.jpg" width="736" height="981" alt="물방울 레이스 커튼 아래 나무 창턱과 하얀 의자가 놓인 창가"></figure>
+      <ul class="intro-cards">
+        <li><span class="ic-k">색</span><h3 class="serif">분홍과 하늘, 크림</h3><p>채도를 낮춘 부드러운 색이 벽과 창가를 감싼다.</p></li>
+        <li><span class="ic-k">결</span><h3 class="serif">레이스와 주름</h3><p>레이스 커튼과 주름 장식, 체크무늬 패브릭이 공간에 섬세한 질감을 더한다.</p></li>
+        <li><span class="ic-k">장식</span><h3 class="serif">구석의 작은 것들</h3><p>리본과 화분, 꽃 한 송이 같은 작은 소품이 방 구석구석에 놓여 있다.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3장 · 들여다보기 — 왼쪽 세로 탭(강조 막대), 가운데 사진, 오른쪽 설명 -->
+  <section class="sec" id="s3">
+    <!-- 단추 장식 — 여백에 흩어 놓은 단추들. 스크롤하면 하나씩 뿅 하고 나타난다 -->
+    <div class="stk-layer" aria-hidden="true">
+      <span class="stk L keep kl" style="--x:20px;--y:150px;--w:92px;--r:-12deg;--i:0;--src:url(assets/stickers/btn1.png?v=2)"><img src="assets/stickers/btn1.png?v=2" alt=""></span>
+      <span class="stk R keep kr" style="--x:50px;--y:140px;--w:88px;--r:10deg;--i:1;--src:url(assets/stickers/btn5.png?v=2)"><img src="assets/stickers/btn5.png?v=2" alt=""></span>
+      <span class="stk L" style="--x:50px;--y:430px;--w:80px;--r:14deg;--i:2;--src:url(assets/stickers/btn3.png?v=2)"><img src="assets/stickers/btn3.png?v=2" alt=""></span>
+      <span class="stk R" style="--x:40px;--y:400px;--w:84px;--r:-8deg;--i:3;--src:url(assets/stickers/btn2.png?v=2)"><img src="assets/stickers/btn2.png?v=2" alt=""></span>
+      <span class="stk L" style="--x:40px;--y:820px;--w:90px;--r:6deg;--i:4;--src:url(assets/stickers/btn4.png?v=2)"><img src="assets/stickers/btn4.png?v=2" alt=""></span>
+      <span class="stk R" style="--x:70px;--y:830px;--w:78px;--r:-10deg;--i:5;--src:url(assets/stickers/btn6b.png)"><img src="assets/stickers/btn6b.png" alt=""></span>
+      <span class="stk R" style="--x:292px;--y:880px;--w:58px;--r:18deg;--i:6;--src:url(assets/stickers/btn7.png?v=2)"><img src="assets/stickers/btn7.png?v=2" alt=""></span>
+    </div>
+    <p class="eyebrow">방 둘러보기</p>
+    <h2 class="serif big center">문을 열고 들어가<br><em>창가에 앉기까지</em></h2>
+    <div class="steps" data-steps>
+      <ol class="step-tabs">
+        <li class="is-on"><button type="button">문 열기</button></li>
+        <li><button type="button">선반 둘러보기</button></li>
+        <li><button type="button">찬장 열기</button></li>
+        <li><button type="button">창가에 앉기</button></li>
+      </ol>
+      <div class="step-media media">
+        <img class="is-on" src="assets/img5.jpg" width="736" height="981" alt="주름 커튼이 걸린 하얀 주방">
+        <img src="assets/img3.jpg" width="1080" height="1350" alt="하늘색 체크 벽지와 크림색 선반이 있는 부엌">
+        <img src="assets/img2.jpg" width="1200" height="1600" alt="레이스 띠를 두른 분홍 찬장의 부엌">
+        <img src="assets/img4.jpg" width="736" height="981" alt="물방울 레이스 커튼 아래 나무 창턱과 하얀 의자가 놓인 창가">
+        <span class="step-bar"><i></i></span>
+      </div>
+      <div class="step-text">
+        <div class="is-on"><span class="num">01</span><h3 class="serif">문 열기</h3><p>천장 아래로 이어진 주름 커튼부터 작은 소품과 패브릭까지, 하얀 주방에 놓인 것들을 따라 들어간다.</p></div>
+        <div><span class="num">02</span><h3 class="serif">선반 둘러보기</h3><p>하늘색 체크 벽지와 크림색 선반. 찻잔과 곰 인형, 옛날 그림이 빼곡히 놓여 있다.</p></div>
+        <div><span class="num">03</span><h3 class="serif">찬장 열기</h3><p>레이스 띠를 두른 분홍 찬장에 작은 카드가 붙어 있다. 그릇마다 귀여운 얼굴이 그려져 있다.</p></div>
+        <div><span class="num">04</span><h3 class="serif">창가에 앉기</h3><p>물방울 레이스 커튼 아래 나무 창턱과 하얀 의자. 겨울 햇살이 깊숙이 들어온다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3장 · 마지막 — 둥근 위 모서리의 화면 가득 사진 위 큰 문장 -->
+  <section class="finale">
+    <img src="assets/img1.jpg" width="832" height="1248" alt="장미 나무와 분홍 소파가 있는 높은 아치 창의 거실">
+    <div class="finale-in">
+      <p class="eyebrow light">공통점</p>
+      <h2 class="serif big light">부드러운 천과 작은 장식이<br>겹겹이 쌓인, <em>다정한 방.</em></h2>
+    </div>
+  </section>
+
+  <!-- ⑥ 4장 물건 — 7주 (weeks/07/01_topic.md 인터뷰 답). 카드를 누르면 상세가 열린다 -->
+  <section class="sec" id="objects">
+    <p class="eyebrow">4장 물건</p>
+    <h2 class="serif big center">보이지 않는 곳의 디테일까지<br><em>내 취향으로 고른 물건들</em></h2>
+    <ul class="objs">
+      <li class="obj">
+        <figure class="media"><img src="assets/obj1_01.jpg" width="3024" height="3024" alt="4장 물건 우양산 사진 1" loading="lazy"></figure>
+        <div class="obj-t"><span class="num">01</span><h3 class="serif"><button type="button" class="obj-open" data-dlg="obj1-d" aria-haspopup="dialog">우양산</button></h3><p>햇살이 강한 날이면 우양산을 챙겨 외출한다.</p></div>
+        <span class="obj-plus" aria-hidden="true">+</span>
+      </li>
+      <li class="obj">
+        <figure class="media"><img src="assets/obj2_01.jpg" width="3024" height="3024" alt="4장 물건 키티 시계 사진 1" loading="lazy"></figure>
+        <div class="obj-t"><span class="num">02</span><h3 class="serif"><button type="button" class="obj-open" data-dlg="obj2-d" aria-haspopup="dialog">키티 시계</button></h3><p>실제로 시간을 확인하는 용도는 아니지만, 인테리어로 두고 있다.</p></div>
+        <span class="obj-plus" aria-hidden="true">+</span>
+      </li>
+      <li class="obj">
+        <figure class="media"><img src="assets/obj3_01.jpg" width="3024" height="3024" alt="4장 물건 선물받은 인형들 사진 1" loading="lazy"></figure>
+        <div class="obj-t"><span class="num">03</span><h3 class="serif"><button type="button" class="obj-open" data-dlg="obj3-d" aria-haspopup="dialog">선물받은 인형들</button></h3><p>책상에 장식해두면 인형을 준 사람들의 마음과 추억을 간직할 수 있다.</p></div>
+        <span class="obj-plus" aria-hidden="true">+</span>
+      </li>
+      <li class="obj">
+        <figure class="media"><img src="assets/obj4_01.jpg" width="3024" height="3024" alt="4장 물건 5년째 함께하는 키보드 사진 1" loading="lazy"></figure>
+        <div class="obj-t"><span class="num">04</span><h3 class="serif"><button type="button" class="obj-open" data-dlg="obj4-d" aria-haspopup="dialog">5년째 함께하는 키보드</button></h3><p>작업을 시작하면 키보드를 두들기며 생각을 글로 옮긴다.</p></div>
+        <span class="obj-plus" aria-hidden="true">+</span>
+      </li>
+      <li class="obj">
+        <figure class="media"><img src="assets/obj5_01.jpg" width="3024" height="3024" alt="4장 물건 스탠리 텀블러 사진 1" loading="lazy"></figure>
+        <div class="obj-t"><span class="num">05</span><h3 class="serif"><button type="button" class="obj-open" data-dlg="obj5-d" aria-haspopup="dialog">스탠리 텀블러</button></h3><p>물을 가득 채운 텀블러로 틈틈이 수분을 보충한다.</p></div>
+        <span class="obj-plus" aria-hidden="true">+</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ⑦ 기준이 쌓이는 자리 — 주마다 기준 한 줄이 한 칸씩 쌓인다 -->
+  <section class="sec" id="criteria">
+    <p class="eyebrow">기준</p>
+    <h2 class="serif big center">기준이 쌓이는 자리</h2>
+    <ol class="crit">
+      <!-- 빈 블록(is-empty)은 기준 한 줄이 생기면 문장을 넣고 is-empty를 지운다 -->
+      <li><span class="ic-k">4주 · 시선</span><p class="serif">저마다의 하늘, 서로의 손, 각자의 길</p></li>
+      <li><span class="ic-k">5주 · 사람</span><p class="serif">나는 화면의 색을 정할 때 사진과 어우러지는 색을 고른다.</p></li>
+      <li><span class="ic-k">6주 · 공간</span><p class="serif">작고 다정한 것들로, 나의 방을 채운다.</p></li>
+      <li><span class="ic-k">7주 · 물건</span><p class="serif">보이지 않는 곳의 디테일까지 내 취향으로 고른 물건들</p></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="logo" href="#top"><span class="logo-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>양서윤</a>
+  <p>나의 취향 아카이브</p>
+  <nav aria-label="장"><a href="#gaze">시선</a><a href="#people">사람</a><a href="#space">공간</a><a href="#objects">물건</a><a href="#criteria">기준</a></nav>
+  <div class="credit"><p>사진</p><ul>
+    <li>1장 시선 — 출처 핀터레스트</li>
+    <li>2장 사람 — 직접 촬영</li>
+    <li>3장 공간 — 수집 이미지 (출처 핀터레스트)</li>
+    <li>4장 물건 — 직접 촬영</li>
+  </ul></div>
+</footer>
+
+<!-- 4장 물건 상세 — 카드를 누르면 열린다 (사진 먼저, 그다음 이름 · 언제·어떻게 · 고른 이유) -->
+<dialog class="obj-dlg" id="obj1-d" aria-labelledby="obj1-t">
+  <button class="obj-x" type="button" aria-label="닫기">×</button>
+  <div class="obj-photos">
+    <figure><img src="assets/obj1_01.jpg" width="3024" height="3024" alt="4장 물건 우양산 사진 1" loading="lazy"><figcaption>올해 여름이 시작될 때, 첫눈에 반해서 바로 구매했던 기억이 있다.</figcaption></figure>
+    <figure><img src="assets/obj1_02.jpg" width="3024" height="3024" alt="4장 물건 우양산 사진 2" loading="lazy"><figcaption>레이스가 두 겹으로 되어 있어 더욱 풍성해보인다</figcaption></figure>
+  </div>
+  <div class="obj-dt"><span class="num">01</span><h3 class="serif" id="obj1-t">우양산</h3><p class="obj-when">햇살이 강한 날이면 우양산을 챙겨 외출한다.</p><p class="obj-why"><span class="ic-k">고른 이유</span>이 우양산만의 도트 무늬, 레이스 디자인을 즐길 수 있어서</p></div>
+</dialog>
+<dialog class="obj-dlg" id="obj2-d" aria-labelledby="obj2-t">
+  <button class="obj-x" type="button" aria-label="닫기">×</button>
+  <div class="obj-photos">
+    <figure><img src="assets/obj2_01.jpg" width="3024" height="3024" alt="4장 물건 키티 시계 사진 1" loading="lazy"><figcaption>자세히 보면 편지를 든 키티 뒤에 천사 날개가 달려 있다. 메신저인 걸까?</figcaption></figure>
+    <figure><img src="assets/obj2_02.jpg" width="3024" height="3024" alt="4장 물건 키티 시계 사진 2" loading="lazy"><figcaption>시계의 기능을 하는 핸드폰은 사실 밑에 자판도 열어볼 수 있다.</figcaption></figure>
+  </div>
+  <div class="obj-dt"><span class="num">02</span><h3 class="serif" id="obj2-t">키티 시계</h3><p class="obj-when">실제로 시간을 확인하는 용도는 아니지만, 인테리어로 두고 있다.</p><p class="obj-why"><span class="ic-k">고른 이유</span>책상을 볼 때마다 좋아하는 캐릭터를 볼 수 있어서</p></div>
+</dialog>
+<dialog class="obj-dlg" id="obj3-d" aria-labelledby="obj3-t">
+  <button class="obj-x" type="button" aria-label="닫기">×</button>
+  <div class="obj-photos">
+    <figure><img src="assets/obj3_01.jpg" width="3024" height="3024" alt="4장 물건 선물받은 인형들 사진 1" loading="lazy"><figcaption>같은 털 인형임에도 크기와 생김새에서 각자 개성이 느껴진다.</figcaption></figure>
+    <figure><img src="assets/obj3_02.jpg" width="3024" height="3024" alt="4장 물건 선물받은 인형들 사진 2" loading="lazy"><figcaption>공통점이 있다면 전부 눈이 동그랗다.</figcaption></figure>
+  </div>
+  <div class="obj-dt"><span class="num">03</span><h3 class="serif" id="obj3-t">선물받은 인형들</h3><p class="obj-when">책상에 장식해두면 인형을 준 사람들의 마음과 추억을 간직할 수 있다.</p><p class="obj-why"><span class="ic-k">고른 이유</span>각자 다른 사람들이 내 취향에 맞춰 선물해준 인형들을 보면 마음이 따뜻해져서</p></div>
+</dialog>
+<dialog class="obj-dlg" id="obj4-d" aria-labelledby="obj4-t">
+  <button class="obj-x" type="button" aria-label="닫기">×</button>
+  <div class="obj-photos">
+    <figure><img src="assets/obj4_01.jpg" width="3024" height="3024" alt="4장 물건 5년째 함께하는 키보드 사진 1" loading="lazy"><figcaption>책상에 잘 어우러지지만 사이사이 있는 무지개색 같은 디테일이 마음에 든다.</figcaption></figure>
+    <figure><img src="assets/obj4_02.jpg" width="3024" height="3024" alt="4장 물건 5년째 함께하는 키보드 사진 2" loading="lazy"><figcaption>스위치에 대해선 잘 모르지만 보이지 않는 부분임에도 굳이 코랄축을 선택했다.</figcaption></figure>
+  </div>
+  <div class="obj-dt"><span class="num">04</span><h3 class="serif" id="obj4-t">5년째 함께하는 키보드</h3><p class="obj-when">작업을 시작하면 키보드를 두들기며 생각을 글로 옮긴다.</p><p class="obj-why"><span class="ic-k">고른 이유</span>손에 익은 타건감과 편안한 사용감으로 작업에 집중할 수 있어서</p></div>
+</dialog>
+<dialog class="obj-dlg" id="obj5-d" aria-labelledby="obj5-t">
+  <button class="obj-x" type="button" aria-label="닫기">×</button>
+  <div class="obj-photos">
+    <figure><img src="assets/obj5_01.jpg" width="3024" height="3024" alt="4장 물건 스탠리 텀블러 사진 1" loading="lazy"><figcaption>하루 할당량으로 매일 텀블러를 비우다 보니 음수량이 늘어난 것 같다.</figcaption></figure>
+    <figure><img src="assets/obj5_02.jpg" width="3024" height="3024" alt="4장 물건 스탠리 텀블러 사진 2" loading="lazy"><figcaption>밑에서부터 올라오는 그러데이션이 마음에 든다. 늘 함께하는 코스터와도 잘 어울린다.</figcaption></figure>
+  </div>
+  <div class="obj-dt"><span class="num">05</span><h3 class="serif" id="obj5-t">스탠리 텀블러</h3><p class="obj-when">물을 가득 채운 텀블러로 틈틈이 수분을 보충한다.</p><p class="obj-why"><span class="ic-k">고른 이유</span>넉넉한 용량과 은은한 컬러가 마음에 들어서</p></div>
+</dialog>
+
+<div class="lb" hidden><button class="lb-x" type="button" aria-label="닫기">×</button><img alt=""></div>
+<script src="main.js?v=28"></script>
+</body>
+</html>

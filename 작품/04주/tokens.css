@@ -1,0 +1,122 @@
+/* Design tokens extracted from gilhuybrecht.com (2026-09-22) */
+
+:root {
+  /* Fluid scale: 1rem = 10px at design width (390 mobile / 1500 desktop), capped at 12px */
+  --size: 390;
+
+  /* Color */
+  --color-bg: #000000;
+  --color-surface: #2c2c2f;
+  --color-surface-glass: rgba(44, 44, 47, 0.6);
+  --color-text: #ffffff;
+  --color-text-hover: rgba(255, 255, 255, 0.7);
+  --color-text-muted: rgba(255, 255, 255, 0.4);
+  --color-border-strong: rgba(255, 255, 255, 0.2);
+  --color-border: rgba(255, 255, 255, 0.15);
+  --color-fill-hover: rgba(255, 255, 255, 0.15);
+  --color-fill-subtle: rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  --font-sans: "Lay Grotesk", "Inter Tight", "Helvetica Neue", Helvetica, "Segoe UI", Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-weight: 500;
+  --text-display: 3.2rem;   /* 7rem on desktop */
+  --text-body: 1.7rem;
+  --text-small: 1.4rem;
+  --leading-display: 0.9;
+  --leading-body: 1.11;
+  --tracking-display: -0.02em;
+
+  /* Layout */
+  --grid-cols: 4;           /* 14 on desktop */
+  --gutter: 1.4rem;
+  --page-margin: 1.4rem;
+  --radius: 0.5rem;
+  --blur-glass: 16px;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-default: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+  --dur-line: 750ms;
+  --dur-fade: 1000ms;
+}
+
+@media (min-width: 650px) {
+  :root {
+    --size: 1500;
+    --text-display: 7rem;
+    --grid-cols: 14;
+  }
+}
+
+html {
+  font-size: clamp(5px, 12px, 10 * 100vw / var(--size));
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-size-adjust: none;
+}
+
+body {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight);
+  line-height: var(--leading-body);
+}
+
+.t-display {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: pretty;
+}
+
+.site-max { width: 100%; margin-inline: auto; padding-inline: var(--page-margin); }
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+.stack { display: grid; }
+.stack > * { grid-area: 1 / 1; }
+
+/* Glass pill link */
+.h-pill { position: relative; }
+.h-pill::before {
+  content: "";
+  position: absolute;
+  inset: -0.4rem -0.8rem -0.3rem;
+  z-index: -1;
+  border-radius: var(--radius);
+  background-color: transparent;
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  transition: background-color var(--dur-fast) var(--ease-out-quad),
+              backdrop-filter var(--dur-fast) var(--ease-out-quad);
+}
+.h-pill:hover::before,
+.h-pill.is-active::before {
+  background-color: var(--color-fill-hover);
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  backdrop-filter: blur(var(--blur-glass));
+  transition-duration: var(--dur-base);
+  transition-timing-function: var(--ease-out-expo);
+}
+
+/* Draw-in underline */
+.uline { position: relative; display: inline-flex; white-space: nowrap; }
+.uline::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -0.2em;
+  height: 0.035em; min-height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--dur-line) var(--ease-out-expo);
+}
+.uline:hover::before,
+.uline.is-active::before { transform: scaleX(1); transform-origin: left center; }

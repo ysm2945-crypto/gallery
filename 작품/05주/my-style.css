@@ -1,0 +1,93 @@
+/* W05-C 낭독형 — 내가 고치는 파일은 이것 하나.
+   값만 바꾼다. 줄을 지우거나 이름을 바꾸지 않는다. */
+:root {
+  --my-bg: #E9E9E9;        /* 바탕 색 (색 코드) — 기본은 연회색 종이 */
+  --my-point: #00846A;     /* 포인트 색 (색 코드 / none) — 이름·날짜·진행선 */
+  --my-type: serif;        /* serif 명조 · sans 고딕 · mono 고정폭 · hand 손글씨 */
+  --my-motion: 1;          /* 0 조용함 · 1 기본 · 2 강함 */
+  --my-density: 1;         /* 0 비움 · 1 기본 · 2 꽉 */
+  --my-image: native;      /* native 흐린 흑백→가운데 오면 원색 · original 원본 · mono 흑백 · tint 색 덮기 */
+
+  /* 이 시스템 고유 항목 2줄 */
+  --my-reveal: grey;       /* 내 한 문장이 차오르는 방식 grey 회색→먹 · outline 윤곽→먹 → 8주 기록 칸: 움직임 */
+}
+
+/* ── 2026-10-19 학생 요청: 메인 글자가 화면에 꽉 차서 줄이고, 사진은 키움 ── */
+:root {
+  --fs-name: 12vw;          /* 이름 상한 19.7vw → 15vw → 12vw (10-19 두 번째 요청, 여전히 가장 큰 글자) */
+  --fs-name-mobile: 15vw;   /* 폰 이름 19vw → 15vw */
+  --fs-read: 3.9vw;         /* 내 한 문장·소개 5.56vw → 3.9vw (약 70%) */
+  --read-width: 72vw;       /* 내 한 문장 폭 96vw → 72vw (양옆 여백) */
+  --fs-claim: 5.2vw;        /* 가져올 한 가지 7.52vw → 5.2vw */
+  --fs-title: 2.3vw;        /* 이유 제목 2.78vw → 2.3vw */
+  --fs-bio: 1.9vw;          /* 본 것·해석 2.55vw → 1.9vw */
+  --bio-width: 46vw;        /* 이유 글 기둥 60vw → 46vw (양옆 사진 자리 넓힘) */
+}
+@media (min-width: 1081px) {
+  .mc-polaroid { width: 19vw; left: calc((var(--bio-width) - 100vw) / 2 + 3vw); }
+  .mc-reason:nth-of-type(even) .mc-polaroid { right: calc((var(--bio-width) - 100vw) / 2 + 3vw); }
+  .mc-polaroid.is-portrait { width: 18vw; }   /* 세로 사진 8.9vw → 18vw (약 2배) */
+}
+@media (max-width: 1080px) {
+  .mc-polaroid, .mc-reason:nth-of-type(even) .mc-polaroid { width: 80%; }
+  .mc-polaroid.is-portrait { width: 70%; }    /* 폰·태블릿 세로 사진 42% → 70% */
+}
+
+/* ── 2026-10-19 학생 요청 2: 사진 채도 조금 낮춤 + 종이 질감 20% ── */
+html.i-native .mc-polaroid.is-colored img,
+html.i-native .mc-polaroid:hover img,
+html.i-original .mc-polaroid img { filter: saturate(.7); }   /* 원색 상태에서 채도 70% */
+.mc-polaroid { isolation: isolate; }
+.mc-polaroid::after {                                         /* 사진 위 종이 결 (코드로 만든 잡음 무늬, 외부 이미지 아님) */
+  content: ""; position: absolute; left: 0; right: 0; top: 0;
+  aspect-ratio: var(--polaroid-ratio, 3 / 4); pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .42 0 0 0 0 .36 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  opacity: .3; mix-blend-mode: multiply;   /* 질감 20% → 30% (10-19 요청 3) */
+}
+@media (max-width: 1080px) { .mc-polaroid { position: relative; } }
+
+/* ── 2026-10-19 학생 요청 3: "우리집의 중심"과 이름 사이 간격 넓힘 ── */
+.mc-hero__kicker { margin-bottom: 3.2vw; }                    /* 1.2vw → 3.2vw */
+@media (max-width: 1080px) { .mc-hero__kicker { margin-bottom: 36px; } }   /* 16px → 36px */
+
+/* ── 2026-10-19 요청 4 중 유지: 빈 인물 띠를 뺀 자리 당기기 (index.html에서 띠 섹션 삭제) ── */
+.mc-claim { padding-bottom: calc(var(--section-gap) * .6); }
+.mc-footer { padding-bottom: 48px; }
+@media (max-width: 1080px) { .mc-footer { padding-bottom: 36px; } }
+
+/* ── 2026-10-19 학생 요청 6: 첫 화면 열기 (neutomni.com 시작 부분 참고 · intro.js가 덮개를 만든다) ──
+   먹색 덮개 위 이름 → 가운데 점선을 가위가 자르고 → 위아래로 살짝 벌어지며 블러로 흐려져 서서히 사라진다 (10-20 수정: 먹 번짐 뺌) */
+html.ink-lock, html.ink-lock body { overflow: hidden; }
+.ink-intro { position: fixed; inset: 0; z-index: 10000; cursor: pointer; color: var(--bg); }
+.ink-half {
+  position: absolute; left: -6vw; right: -6vw; background: var(--ink);
+  filter: blur(calc(var(--open, 0) * 28px)); opacity: calc(1 - var(--open, 0)); will-change: transform, filter, opacity;
+}
+.ink-half--top    { top: -6vh; height: 56vh; transform: translateY(calc(var(--open, 0) * -18%)); }
+.ink-half--bottom { bottom: -6vh; height: 56vh; transform: translateY(calc(var(--open, 0) * 18%)); }
+.ink-name {
+  position: absolute; left: 6vw; right: 6vw; top: calc(6vh + 3vw); text-align: center;
+  font-family: var(--f-text); font-weight: var(--w-regular); font-size: 15vw; line-height: 1; color: var(--bg);
+  white-space: nowrap;
+}
+.ink-line {
+  position: absolute; left: 0; right: 0; top: 50%; height: 0;
+  border-top: 1px dashed rgba(255, 255, 255, .45); transition: opacity .25s;
+}
+.ink-line__cut { position: absolute; left: 0; top: -1px; height: 1px; width: var(--cut, 0%); background: var(--bg); }
+.ink-scissors {
+  position: absolute; top: 0; left: var(--cut, 0%); transform: translate(-50%, -54%) rotate(0deg);
+  font-size: 26px; line-height: 1; color: var(--bg);
+}
+.ink-intro.is-open .ink-line { opacity: 0; }
+.ink-intro.is-skip .ink-half { opacity: 0; filter: blur(28px); transition: opacity .4s ease, filter .4s ease; }
+.ink-intro.is-skip .ink-line { opacity: 0; }
+@media (max-width: 1080px) { .ink-name { font-size: 19vw; top: calc(6vh + 8vh); } }
+
+/* ── 2026-10-20 학생 요청 8: "내 작업에 가져올 한 가지" 줄을 포인트 색(녹색)으로 — 윤곽선 + 채움(sig.js) ── */
+html.is-reveal .mc-claim__a .w { -webkit-text-stroke-color: var(--point); }
+.mc-claim__a { color: var(--point); }
+
+/* ── 2026-10-20 학생 요청 9: "내 작업에 가져올 한 가지"(제목)와 아래 문구(내용) 사이 띄움 ── */
+.mc-claim__a { margin-bottom: 4vw; }
+@media (max-width: 1080px) { .mc-claim__a { margin-bottom: 28px; } }

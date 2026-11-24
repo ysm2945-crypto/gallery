@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>양서윤 — 머물고 싶은 다정한 방</title>
+<meta name="description" content="레이스 커튼, 분홍 찬장, 꽃무늬 벽지 — 작고 다정한 것들로 채운 방.">
+<meta property="og:title" content="양서윤 — 머물고 싶은 다정한 방">
+<meta property="og:description" content="레이스 커튼, 분홍 찬장, 꽃무늬 벽지 — 작고 다정한 것들로 채운 방.">
+<meta property="og:image" content="assets/img1.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Figtree:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;700&family=Pinyon+Script&family=Cormorant+SC:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css?v=27">
+</head>
+<body>
+
+<!-- 사진 선명하게 — 작은 원본이 늘어날 때 흐려지는 것을 줄인다 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="sharpen" color-interpolation-filters="sRGB"><feConvolveMatrix order="3" preserveAlpha="true" kernelMatrix="0 -0.6 0 -0.6 3.4 -0.6 0 -0.6 0"/></filter></svg>
+
+<!-- 떠 있는 알약 메뉴 -->
+<header class="nav-wrap">
+  <nav class="pill-nav" aria-label="섹션">
+    <a class="logo" href="#top"><span class="logo-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>양서윤</a>
+    <div class="seg" aria-hidden="false"><a href="#s3" class="is-on">들여다보기</a><a href="#s4">방 셋</a></div>
+    <div class="links"><a href="#s1">소개</a><a href="#s5">가까이</a></div>
+    <a class="btn btn-soft" href="#s6">기록 보기</a>
+  </nav>
+</header>
+
+<main>
+  <!-- ① 첫 화면 — 가운데 정렬 세리프 제목, 원형으로 도는 글자, 아래 둥근 화면에 방 사진이 영상처럼 흐른다 -->
+  <section class="hero" id="top">
+    <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+      <defs><path id="ringPath" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+      <text><textPath href="#ringPath" textLength="486" lengthAdjust="spacing">LACE · RIBBONS · FLORALS · GINGHAM · SUNLIGHT · ROSES · </textPath></text>
+    </svg>
+    <p class="eyebrow">YANG SEOYUN · 머물고 싶은 방</p>
+    <h1 class="serif">작고 다정한 것들로,<br><em>나의 방을 채운다.</em></h1>
+    <p class="hero-sub">레이스 커튼, 분홍 찬장, 꽃무늬 벽지 — 다섯 장의 사진으로 머물고 싶은 방을 모았습니다.</p>
+    <a class="btn btn-soft btn-lg" href="#s3">방 들여다보기</a>
+    <p class="note">사진 다섯 장 · 방 다섯 곳</p>
+
+    <div class="reel-card">
+      <div class="reel" aria-hidden="true">
+        <img src="assets/img1.jpg" alt=""><img src="assets/img4.jpg" alt=""><img src="assets/img2.jpg" alt=""><img src="assets/img3.jpg" alt=""><img src="assets/img5.jpg" alt="">
+      </div>
+      <!-- 흐르는 글자 — 왼쪽에서는 옅은 글자로 흘러와 가운데 아래 소리 막대를 지나면 짙은 띠 위 흰 글자가 된다 -->
+      <svg class="ribbon" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+          <path id="wave" d="M-200,70 C120,40 380,262 600,262 S1020,90 1400,40"/>
+          <clipPath id="cutL"><rect x="-400" y="0" width="1000" height="320"/></clipPath>
+          <clipPath id="cutR"><rect x="600" y="0" width="1000" height="320"/></clipPath>
+        </defs>
+        <g clip-path="url(#cutL)">
+          <text class="rb-raw"><textPath href="#wave" class="rb-tp">Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. </textPath></text>
+        </g>
+        <g clip-path="url(#cutR)">
+          <use href="#wave" class="rb-band"/>
+          <text class="rb-clean"><textPath href="#wave" class="rb-tp">Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. Open the pink cupboard and find a ribbon of lace. By the window, winter sunlight pours in. A single flower rests on the gingham cloth. </textPath></text>
+        </g>
+        <g class="rb-pill" transform="translate(600 262)">
+          <rect x="-74" y="-27" width="148" height="54" rx="27"/>
+          <g class="rb-bars"><rect x="-44" y="-9" width="4" height="18" rx="2"/><rect x="-33" y="-14" width="4" height="28" rx="2"/><rect x="-22" y="-8" width="4" height="16" rx="2"/><rect x="-11" y="-16" width="4" height="32" rx="2"/><rect x="0" y="-10" width="4" height="20" rx="2"/><rect x="11" y="-15" width="4" height="30" rx="2"/><rect x="22" y="-7" width="4" height="14" rx="2"/><rect x="33" y="-13" width="4" height="26" rx="2"/><rect x="44" y="-9" width="4" height="18" rx="2"/></g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ② 짙은 면 — 다섯 장에 담긴 결이 로고 띠처럼 흐른다 -->
+  <section class="panel panel-dark">
+    <p class="eyebrow light">다섯 장에 담긴 결</p>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Lace</span><span>Ribbons</span><span>Pink Cupboards</span><span>Gingham</span><span>Rose Trees</span><span>Ruffled Curtains</span><span>Hearts</span><span>Wooden Sills</span>
+        <span>Lace</span><span>Ribbons</span><span>Pink Cupboards</span><span>Gingham</span><span>Rose Trees</span><span>Ruffled Curtains</span><span>Hearts</span><span>Wooden Sills</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 소개 — 짙은 장밋빛 면, 가운데 큰 문장, 사진 카드 + 작은 카드 셋 -->
+  <section class="panel panel-berry" id="s1">
+    <h2 class="serif big">부드러운 색이 <em>겹겹이</em> 쌓인 곳</h2>
+    <p class="sub">채도를 낮춘 분홍과 하늘, 크림. 손끝에 닿을 것 같은 천의 결과 구석마다 놓인 작은 장식들.</p>
+    <div class="intro-grid">
+      <figure class="media intro-fig"><img src="assets/img4.jpg" width="736" height="981" alt="물방울 레이스 커튼 아래 나무 창턱과 하얀 의자가 놓인 창가"></figure>
+      <ul class="intro-cards">
+        <li><span class="ic-k">색</span><h3 class="serif">분홍과 하늘, 크림</h3><p>채도를 낮춘 부드러운 색이 벽과 찬장을 덮습니다.</p></li>
+        <li><span class="ic-k">결</span><h3 class="serif">레이스와 주름</h3><p>레이스 커튼, 주름 장식, 체크무늬 식탁보. 손끝에 닿을 것 같은 천의 결.</p></li>
+        <li><span class="ic-k">장식</span><h3 class="serif">구석의 작은 것들</h3><p>리본과 하트, 꽃 한 송이, 작은 인형이 구석마다 놓여 있습니다.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ④ 들여다보기 — 왼쪽 세로 탭(강조 막대), 가운데 사진, 오른쪽 설명 -->
+  <section class="sec" id="s3">
+    <!-- 단추 장식 — 여백에 흩어 놓은 단추들. 스크롤하면 하나씩 뿅 하고 나타난다 -->
+    <div class="stk-layer" aria-hidden="true">
+      <span class="stk L keep kl" style="--x:20px;--y:150px;--w:92px;--r:-12deg;--i:0;--src:url(assets/stickers/btn1.png)"><img src="assets/stickers/btn1.png" alt=""></span>
+      <span class="stk R keep kr" style="--x:50px;--y:140px;--w:88px;--r:10deg;--i:1;--src:url(assets/stickers/btn5.png)"><img src="assets/stickers/btn5.png" alt=""></span>
+      <span class="stk L" style="--x:50px;--y:430px;--w:80px;--r:14deg;--i:2;--src:url(assets/stickers/btn3.png)"><img src="assets/stickers/btn3.png" alt=""></span>
+      <span class="stk R" style="--x:40px;--y:400px;--w:84px;--r:-8deg;--i:3;--src:url(assets/stickers/btn2.png)"><img src="assets/stickers/btn2.png" alt=""></span>
+      <span class="stk L" style="--x:40px;--y:820px;--w:90px;--r:6deg;--i:4;--src:url(assets/stickers/btn4.png)"><img src="assets/stickers/btn4.png" alt=""></span>
+      <span class="stk R" style="--x:70px;--y:830px;--w:78px;--r:-10deg;--i:5;--src:url(assets/stickers/btn6.png)"><img src="assets/stickers/btn6.png" alt=""></span>
+      <span class="stk R" style="--x:292px;--y:880px;--w:58px;--r:18deg;--i:6;--src:url(assets/stickers/btn7.png)"><img src="assets/stickers/btn7.png" alt=""></span>
+    </div>
+    <p class="eyebrow">들여다보기</p>
+    <h2 class="serif big center">문을 열고 들어가<br><em>창가에 앉기까지</em></h2>
+    <div class="steps" data-steps>
+      <ol class="step-tabs">
+        <li class="is-on"><button type="button">문 열기</button></li>
+        <li><button type="button">둘러보기</button></li>
+        <li><button type="button">찬장 열기</button></li>
+        <li><button type="button">창가에 앉기</button></li>
+      </ol>
+      <div class="step-media media">
+        <img class="is-on" src="assets/img5.jpg" width="736" height="981" alt="주름 커튼이 걸린 하얀 주방">
+        <img src="assets/img3.jpg" width="1080" height="1350" alt="하늘색 체크 벽지와 크림색 선반이 있는 부엌">
+        <img src="assets/img2.jpg" width="1200" height="1600" alt="레이스 띠를 두른 분홍 찬장의 부엌">
+        <img src="assets/img4.jpg" width="736" height="981" alt="물방울 레이스 커튼 아래 나무 창턱과 하얀 의자가 놓인 창가">
+        <span class="step-bar"><i></i></span>
+      </div>
+      <div class="step-text">
+        <div class="is-on"><span class="num">01</span><h3 class="serif">문 열기</h3><p>찬장 위로 하얀 주름 커튼이 걸린 주방. 문에 걸린 가방과 별무늬 매트가 먼저 반깁니다.</p></div>
+        <div><span class="num">02</span><h3 class="serif">둘러보기</h3><p>하늘색 체크 벽지와 크림색 선반. 찻잔과 곰 인형, 옛날 그림이 빼곡히 놓여 있습니다.</p></div>
+        <div><span class="num">03</span><h3 class="serif">찬장 열기</h3><p>분홍 찬장에 레이스 띠를 두르고 작은 카드를 붙였습니다. 그릇마다 귀여운 얼굴이 있습니다.</p></div>
+        <div><span class="num">04</span><h3 class="serif">창가에 앉기</h3><p>물방울 레이스 커튼 아래 나무 창턱과 하얀 의자. 겨울 햇살이 깊게 들어옵니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 방 셋 — 밑줄 강조 제목, 사진 카드와 글이 번갈아 놓이는 줄 셋 -->
+  <section class="sec" id="s4">
+    <p class="eyebrow">방 셋</p>
+    <h2 class="serif big center">오래 머물고 싶은 <em class="mark">세 개의 방,</em><br>세 가지 다정함</h2>
+    <div class="rooms">
+      <article class="room">
+        <figure class="media"><img src="assets/img1.jpg" width="832" height="1248" alt="장미 나무와 분홍 소파가 있는 높은 아치 창의 거실"></figure>
+        <div class="room-t"><span class="num">01</span><h3 class="serif">장미 거실</h3><p>높은 아치 창 아래 장미 나무가 자라는 분홍 거실. 둥근 소파가 나무를 감쌉니다.</p></div>
+      </article>
+      <article class="room">
+        <figure class="media"><img src="assets/img3.jpg" width="1080" height="1350" alt="하늘색 체크 벽지와 크림색 선반이 있는 부엌"></figure>
+        <div class="room-t"><span class="num">02</span><h3 class="serif">하늘 체크 부엌</h3><p>하늘색 체크무늬로 덮인 작은 부엌. 선반마다 오래된 찻잔과 인형이 앉아 있습니다.</p></div>
+      </article>
+      <article class="room">
+        <figure class="media"><img src="assets/img4.jpg" width="736" height="981" alt="물방울 레이스 커튼 아래 나무 창턱과 하얀 의자가 놓인 창가"></figure>
+        <div class="room-t"><span class="num">03</span><h3 class="serif">레이스 창가</h3><p>레이스 커튼이 겹겹이 드리운 창가. 나무 창턱에 기대 햇살을 받는 자리.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ⑥ 가까이 — 베이지 상자 안 알약 탭 + 사진 위 + 표식 -->
+  <section class="sec" id="s5">
+    <div class="box">
+      <div class="box-head">
+        <div>
+          <p class="eyebrow left">가까이</p>
+          <h2 class="serif mid">사진 위 <em>+</em> 를 누르면<br>작은 것들이 보입니다</h2>
+        </div>
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" class="is-on">장미 거실</button>
+          <button type="button" role="tab">분홍 부엌</button>
+          <button type="button" role="tab">하얀 주방</button>
+        </div>
+      </div>
+      <div class="scenes">
+        <div class="scene is-on">
+          <img src="assets/img1.jpg" width="832" height="1248" alt="장미 나무와 분홍 소파가 있는 높은 아치 창의 거실">
+          <div class="spot" style="--x:50%;--y:30%"><button type="button" aria-label="장미 나무">+</button><div class="card"><h4>장미 나무</h4><p>분홍 장미가 핀 나무 한 그루가 방 한가운데 서 있습니다.</p></div></div>
+          <div class="spot" style="--x:80%;--y:50%"><button type="button" aria-label="아치 창">+</button><div class="card"><h4>아치 창</h4><p>길쭉한 아치 창으로 빛이 길게 들어옵니다.</p></div></div>
+          <div class="spot" style="--x:22%;--y:74%"><button type="button" aria-label="둥근 소파">+</button><div class="card"><h4>둥근 소파</h4><p>분홍 소파가 원을 그리며 앉을 자리를 만듭니다.</p></div></div>
+        </div>
+        <div class="scene">
+          <img src="assets/img2.jpg" width="1200" height="1600" alt="레이스 띠를 두른 분홍 찬장의 부엌">
+          <div class="spot" style="--x:25%;--y:14%"><button type="button" aria-label="레이스 띠">+</button><div class="card"><h4>레이스 띠</h4><p>찬장 문마다 리본 달린 레이스를 둘렀습니다.</p></div></div>
+          <div class="spot" style="--x:62%;--y:55%"><button type="button" aria-label="고양이 그릇">+</button><div class="card"><h4>고양이 그릇</h4><p>고양이 얼굴 그릇과 분홍 컵이 건조대에 줄지어 있습니다.</p></div></div>
+          <div class="spot" style="--x:40%;--y:82%"><button type="button" aria-label="작은 카드">+</button><div class="card"><h4>작은 카드</h4><p>아래 찬장에는 하트와 꽃 그림 카드를 붙였습니다.</p></div></div>
+        </div>
+        <div class="scene">
+          <img src="assets/img5.jpg" width="736" height="981" alt="주름 커튼이 걸린 하얀 주방">
+          <div class="spot" style="--x:60%;--y:18%"><button type="button" aria-label="주름 커튼">+</button><div class="card"><h4>주름 커튼</h4><p>찬장 위로 하얀 주름 커튼이 물결칩니다.</p></div></div>
+          <div class="spot" style="--x:45%;--y:62%"><button type="button" aria-label="나무 상판">+</button><div class="card"><h4>나무 상판</h4><p>따뜻한 나무 상판 위에 작은 냄비와 오븐이 놓여 있습니다.</p></div></div>
+          <div class="spot" style="--x:15%;--y:80%"><button type="button" aria-label="별무늬 매트">+</button><div class="card"><h4>별무늬 매트</h4><p>현관 앞에 알록달록 별이 박힌 매트.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑦ 기록 — 분홍 공단 천 위에 놓인 레이스 라벨. 가운데 리넨 면에 수놓은 글씨, 값 넷은 작은 레이스 라벨 -->
+  <section class="panel record" id="s6">
+    <div class="lace lace-main">
+      <div class="linen">
+        <p class="script">Five Photos, One Feeling</p>
+        <h2 class="stitch">다섯 장에서 겹치는 것</h2>
+        <div class="orn"><svg class="flourish" viewBox="0 0 120 20" aria-hidden="true"><path d="M118 10C96 10 86 3 74 6c-9 2-8 11-1 11 6 0 7-7 1-8M2 10c22 0 32 7 44 4 9-2 8-11 1-11-6 0-7 7-1 8" fill="none"/></svg><svg class="bow" viewBox="0 0 64 40" aria-hidden="true"><path d="M32 18c-6-9-20-15-26-11-5 3-3 14 4 17 6 2 15-1 22-6zM32 18c6-9 20-15 26-11 5 3 3 14-4 17-6 2-15-1-22-6z"/><path d="M29 20l-7 18 6-3 3 4 1-17zM35 20l7 18-6-3-3 4-1-17z"/><ellipse cx="32" cy="19" rx="4.5" ry="5"/></svg><svg class="flourish" viewBox="0 0 120 20" aria-hidden="true"><path d="M118 10C96 10 86 3 74 6c-9 2-8 11-1 11 6 0 7-7 1-8M2 10c22 0 32 7 44 4 9-2 8-11 1-11-6 0-7 7-1 8" fill="none"/></svg></div>
+        <p class="caps">· 기록 · FROM YANG SEOYUN ·</p>
+      </div>
+    </div>
+    <!-- 값 넷 — 작은 레이스 라벨을 핀으로 꽂아 자유롭게 흩어 놓은 콜라주 -->
+    <div class="collage">
+      <div class="lace lace-sm c1"><div class="linen"><span class="tag">색</span><b class="stitch">분홍 · 하늘 · 크림</b></div><i class="pin"></i></div>
+      <div class="lace lace-sm c2"><div class="linen"><span class="tag">결</span><b class="stitch">레이스와 주름</b></div><i class="pin"></i></div>
+      <div class="lace lace-sm c3"><div class="linen"><span class="tag">밀도</span><b class="stitch">작은 것이 가득</b></div><i class="pin"></i></div>
+      <div class="lace lace-sm c4"><div class="linen"><span class="tag">빛</span><b class="stitch">창으로 드는 햇살</b></div><i class="pin"></i></div>
+      <img class="mini btnA" src="assets/stickers/btn3.png" alt="">
+      <img class="mini btnB" src="assets/stickers/btn7.png" alt="">
+    </div>
+    <!-- 양옆 장식 — 단추와 별 뜨개 -->
+    <div class="side-decos" aria-hidden="true">
+      <img class="side-deco L" style="--x:7%;--y:46%;--w:54px;--r:18deg" src="assets/stickers/btn1.png" alt="">
+      <img class="side-deco L" style="--x:10%;--y:88%;--w:46px;--r:-20deg" src="assets/stickers/btn5.png" alt="">
+      <img class="side-deco R" style="--x:4%;--y:10%;--w:58px;--r:14deg" src="assets/stickers/btn4.png" alt="">
+      <img class="side-deco R" style="--x:8%;--y:66%;--w:50px;--r:22deg" src="assets/stickers/btn2.png" alt="">
+      <img class="side-deco R" style="--x:3%;--y:86%;--w:66px;--r:-14deg" src="assets/stickers/btn6.png" alt="">
+    </div>
+  </section>
+
+  <!-- ⑧ 마지막 — 둥근 위 모서리의 화면 가득 사진 위 큰 문장 -->
+  <section class="finale">
+    <img src="assets/img1.jpg" width="832" height="1248" alt="장미 나무와 분홍 소파가 있는 높은 아치 창의 거실">
+    <div class="finale-in">
+      <p class="eyebrow light">공통점</p>
+      <h2 class="serif big light">부드러운 천과 작은 장식이<br>겹겹이 쌓인, <em>다정한 방.</em></h2>
+      <a class="btn btn-soft btn-lg" href="#top">처음으로</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="logo" href="#top"><span class="logo-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>양서윤</a>
+  <p>머물고 싶은 다정한 방, 다섯 장의 기록.</p>
+  <nav><a href="#s1">소개</a><a href="#s3">들여다보기</a><a href="#s4">방 셋</a><a href="#s6">기록</a></nav>
+  <p class="credit">사진: 수집 이미지 (출처 미확인)</p>
+</footer>
+
+<div class="lb" hidden><button class="lb-x" type="button" aria-label="닫기">×</button><img alt=""></div>
+<script src="main.js?v=27"></script>
+</body>
+</html>
