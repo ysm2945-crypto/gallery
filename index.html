@@ -44,8 +44,14 @@
   .grid { display: grid; grid-template-columns: repeat(24, 1fr); column-gap: 16px; row-gap: 80px; margin-top: 96px; }
   .c { grid-column: span 24; min-width: 0; }
   @media (min-width: 640px) { .c { grid-column: span 12; } }
-  @media (min-width: 1040px) { .c { grid-column: span 8; } }
-  .frame { aspect-ratio: 5 / 4; background: var(--thumb); isolation: isolate; }
+  @media (min-width: 1040px) {
+    .c { grid-column: span 24; display: grid; grid-template-columns: 1fr 1fr; column-gap: 64px; align-items: center; padding: 80px 0; border-top: 1px solid rgba(255,255,255,.14); }
+    .c:first-child { border-top: 0; padding-top: 40px; }
+    .c:nth-child(even) .card-visual { order: 2; }
+    .c:nth-child(even) .card-body { order: 1; }
+    .grid { row-gap: 0; }
+  }
+  .frame { aspect-ratio: 1 / 1; background: var(--thumb); isolation: isolate; }
   .frame iframe { mix-blend-mode: multiply; }
   .frame iframe { display: block; width: 100%; height: 100%; border: 0; }
   .eyebrow { margin: 20px 0 0; font-size: 12px; line-height: 1.4; color: var(--muted); letter-spacing: 0; }
@@ -184,6 +190,27 @@
 
   /* 인덱스: 메뉴가 700이라 로고도 700으로 */
   .brand, .gnb .brand { font-weight: 700 !important; }
+
+  /* 별 모빌 — 각 카드 위에 매달린 별 + 실 */
+  .card-visual { display: flex; flex-direction: column; }
+  .card-top { display: flex; flex-direction: column; align-items: center; padding-bottom: 0; }
+  .star-svg { display: block; width: 38px; height: 38px; color: rgba(255,255,255,.86); flex-shrink: 0; will-change: transform; transform-origin: center; }
+  .thread { width: 1px; height: 32px; background: rgba(255,255,255,.26); flex-shrink: 0; }
+  /* 카드 텍스트 영역 */
+  .card-body { }
+  .c .eyebrow { margin-top: 28px; }
+  @media (min-width: 1040px) {
+    .c .eyebrow { margin-top: 0; }
+    .c dl { margin-top: 32px; gap: 10px 24px; }
+    .c .go { margin-top: 32px; font-size: 13px; }
+    .card-body { max-width: 480px; }
+    .c:nth-child(even) .card-body { margin-left: auto; }
+  }
+  /* 본문 텍스트 가독성 */
+  dd { font-size: 14px; line-height: 1.72; color: rgba(255,255,255,.9) !important; }
+  dt { line-height: 1.72; }
+  /* 별 위로 카드 위쪽 여백 */
+  @media (max-width: 1039px) { .c { padding-top: 16px; } }
 </style>
 </head>
 <body>
@@ -233,21 +260,31 @@
     return Object.keys(ok).length ? "&color=" + encodeURIComponent(JSON.stringify(ok)) : "";
   };
   const frames = [];
+  const STAR_HTML = '<svg class="star-svg" viewBox="-14 -14 28 28" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="-11" x2="0" y2="-3.5" stroke="currentColor" stroke-width="0.7"/><line x1="0" y1="3.5" x2="0" y2="11" stroke="currentColor" stroke-width="0.7"/><line x1="-11" y1="0" x2="-3.5" y2="0" stroke="currentColor" stroke-width="0.7"/><line x1="3.5" y1="0" x2="11" y2="0" stroke="currentColor" stroke-width="0.7"/><line x1="-5.5" y1="-5.5" x2="-2" y2="-2" stroke="currentColor" stroke-width="0.7" opacity="0.52"/><line x1="2" y1="-2" x2="5.5" y2="-5.5" stroke="currentColor" stroke-width="0.7" opacity="0.52"/><line x1="5.5" y1="5.5" x2="2" y2="2" stroke="currentColor" stroke-width="0.7" opacity="0.52"/><line x1="-2" y1="2" x2="-5.5" y2="5.5" stroke="currentColor" stroke-width="0.7" opacity="0.52"/><circle cx="0" cy="0" r="1.6" fill="none" stroke="currentColor" stroke-width="0.7"/><circle cx="0" cy="-11" r="1.1" fill="currentColor"/><circle cx="0" cy="11" r="1.1" fill="currentColor"/><circle cx="-11" cy="0" r="1.1" fill="currentColor"/><circle cx="11" cy="0" r="1.1" fill="currentColor"/></svg><div class="thread"></div>';
   cards.forEach((c) => {
     const obj = NAME_OK.test(String(c.object)) ? c.object : "terrain";
     const href = safe(c.href) || "weeks/week-" + pad(c.week) + ".html";
     const art = document.createElement("article"); art.className = "c";
+    // card-visual: 별 모빌 + 프레임
+    const cv = document.createElement("div"); cv.className = "card-visual";
+    const ctop = document.createElement("div"); ctop.className = "card-top";
+    ctop.innerHTML = STAR_HTML;
     const fr = document.createElement("div"); fr.className = "frame";
     const ifr = document.createElement("iframe");
     ifr.src = "objects/hairline-" + obj + ".html?embed=1&week=" + encodeURIComponent(c.week) + colorQuery(Object.assign({}, BLUE, (c.color && typeof c.color === "object") ? c.color : {}));
     ifr.title = (TOPIC[c.week] || "") + " 오브젝트"; ifr.dataset.href = href;
-    fr.appendChild(ifr); art.appendChild(fr); frames.push(ifr);
-    const eb = document.createElement("p"); eb.className = "eyebrow"; eb.textContent = pad(c.week) + " " + (EN[String(c.week)] || ""); art.appendChild(eb);
-    const h = document.createElement("h2"); h.textContent = String(c.nameEn || c.name || ""); art.appendChild(h);
+    fr.appendChild(ifr); frames.push(ifr);
+    cv.appendChild(ctop); cv.appendChild(fr);
+    art.appendChild(cv);
+    // card-body: 텍스트
+    const cb = document.createElement("div"); cb.className = "card-body";
+    const eb = document.createElement("p"); eb.className = "eyebrow"; eb.textContent = pad(c.week) + " " + (EN[String(c.week)] || ""); cb.appendChild(eb);
+    const h = document.createElement("h2"); h.textContent = String(c.nameEn || c.name || ""); cb.appendChild(h);
     const dl = document.createElement("dl");
     [["Content", c.what], ["Intent", c.why], ["Standard", c.line]].forEach(([k, v]) => { if (!v) return; const dt = document.createElement("dt"), dd = document.createElement("dd"); dt.textContent = k; dd.textContent = String(v); dl.append(dt, dd); });
-    art.appendChild(dl);
-    const a = document.createElement("a"); a.className = "go"; a.href = href; a.textContent = "그 주 작업 보기 →"; art.appendChild(a);
+    cb.appendChild(dl);
+    const a = document.createElement("a"); a.className = "go"; a.href = href; a.textContent = "그 주 작업 보기 →"; cb.appendChild(a);
+    art.appendChild(cb);
     $("grid").appendChild(art);
   });
   addEventListener("message", (e) => {
@@ -298,6 +335,29 @@ var x=-100,y=-100,cx=x,cy=y;
 addEventListener("mousemove",function(e){x=e.clientX;y=e.clientY;var b=g.getBoundingClientRect(),inside=e.clientY>=b.top&&e.clientY<=b.bottom;document.body.classList.toggle("in-gnb",inside);r.classList.toggle("on",inside);r.classList.toggle("big",!!(inside&&e.target.closest&&e.target.closest(".gnb a,.gnb button")));},{passive:true});
 document.addEventListener("mouseleave",function(){document.body.classList.remove("in-gnb");r.classList.remove("on");});
 (function loop(){cx+=(x-cx)*.22;cy+=(y-cy)*.22;var b=g.getBoundingClientRect();r.style.transform="translate("+(cx-b.left).toFixed(1)+"px,"+(cy-b.top).toFixed(1)+"px) translate(-50%,-50%)";requestAnimationFrame(loop);})();
+})();</script>
+<script>(function(){
+  if(matchMedia("(pointer: coarse)").matches||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  var stars=Array.from(document.querySelectorAll(".star-svg"));
+  if(!stars.length)return;
+  var mx=innerWidth/2,my=innerHeight/2;
+  var sps=stars.map(function(){return{a:0,v:0};});
+  addEventListener("mousemove",function(e){mx=e.clientX;my=e.clientY;},{passive:true});
+  (function loop(){
+    requestAnimationFrame(loop);
+    stars.forEach(function(el,i){
+      var r=el.getBoundingClientRect();
+      var cx=r.left+r.width/2,cy=r.top+r.height/2;
+      var dist=Math.hypot(mx-cx,my-cy);
+      var inf=Math.max(0,1-dist/300);
+      var target=(mx<cx?-1:1)*inf*16;
+      var sp=sps[i];
+      sp.v+=(target-sp.a)*0.036;
+      sp.v*=0.80;
+      sp.a+=sp.v;
+      el.style.transform="rotate("+sp.a.toFixed(2)+"deg)";
+    });
+  })();
 })();</script>
 </body>
 </html>
