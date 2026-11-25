@@ -877,23 +877,30 @@ var HL = (() => {
 </script>
 <script type="module" id="hl-figure">
 /**
- * Moon: a single round disc on a base plate. While the pointer rests inside
- * the circle, the disc slowly rises to full height on a spring — waxing from a
- * thin sliver to a full dome. When the pointer leaves, it settles back down.
- * The slider is the resting height.
+ * Moon & Book: an open book lies on a base plate; a round moon disc rises
+ * above it when the pointer rests inside the circle. When the pointer
+ * leaves, the moon settles back down to a crescent. The slider is the
+ * resting height.
  *
- * The pattern: one spring, one object. Continuous spring on height,
- * hit test on the circular footprint at z = 0 (which never moves).
+ * The pattern: one spring drives the moon height; hit test on the circular
+ * footprint at z = 0 (which never moves).
  */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const D = 34, PB = 6;
-const H_FULL = 24;
-const CX = D / 2 + PB, CY = D / 2 + PB;
-const PLATE_W = D + PB * 2, PLATE_D = D + PB * 2;
+const PLATE_W = 48, PLATE_D = 36, PB = 5;
+const H_FULL = 26;
+// book dimensions
+const BK_W = 36, BK_D = 26, BK_H = 2.5;      // overall open book footprint
+const PAGE_W = 16, PAGE_D = BK_D, PAGE_H = BK_H; // each page half
+const SPINE_W = 4, SPINE_D = BK_D;             // spine strip in between
+const BK_X = (PLATE_W - BK_W) / 2;
+const BK_Y = (PLATE_D - BK_D) / 2;
+// moon sits centred above the book
+const CX = PLATE_W / 2, CY = PLATE_D / 2;
+const MOON_D = 20;
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
@@ -903,9 +910,9 @@ function mount({ stage, svg, read }, value) {
     [PLATE_W, PLATE_D, -PB],
     [PLATE_W, 0, -PB],
     [0, PLATE_D, -PB],
-    [0, 0, H_FULL],
-    [PLATE_W, PLATE_D, H_FULL],
-  ], 200, 160);
+    [0, 0, H_FULL + BK_H],
+    [PLATE_W, PLATE_D, H_FULL + BK_H],
+  ], 200, 162);
   const P = proj(C), front = facing(C);
 
   const hRest = clamp(value, 1, H_FULL * 0.4);
@@ -919,11 +926,29 @@ function mount({ stage, svg, read }, value) {
   const [pr, pi] = rings(0, 0, PLATE_W, PLATE_D, 7, 2.0);
   put(solid(g), prism(P, front, pr, pi, -PB, 0));
 
-  // Moon disc
+  // Open book — left page
+  const lpx0 = BK_X, lpy0 = BK_Y;
+  const [lpr, lpi] = rings(lpx0, lpy0, lpx0 + PAGE_W, lpy0 + PAGE_D, 2.0, 1.0);
+  put(solid(g), prism(P, front, lpr, lpi, 0, PAGE_H));
+
+  // Open book — spine
+  const spx0 = BK_X + PAGE_W, spy0 = BK_Y;
+  const [spr2, spi2] = rings(spx0, spy0, spx0 + SPINE_W, spy0 + SPINE_D, 1.0, 1.4);
+  const spineS = solid(g);
+  put(spineS, prism(P, front, spr2, spi2, 0, PAGE_H + 1));
+  spineS.sil.classList.add("hi");
+
+  // Open book — right page
+  const rpx0 = BK_X + PAGE_W + SPINE_W, rpy0 = BK_Y;
+  const [rpr, rpi] = rings(rpx0, rpy0, rpx0 + PAGE_W, rpy0 + PAGE_D, 2.0, 1.0);
+  put(solid(g), prism(P, front, rpr, rpi, 0, PAGE_H));
+
+  // Moon disc (animated height)
   const moon = solid(g);
   function drawMoon(h) {
-    const [mr, mi] = rings(PB, PB, PB + D, PB + D, D / 2, 4.0);
-    put(moon, prism(P, front, mr, mi, 0, h));
+    const mx0 = CX - MOON_D / 2, my0 = CY - MOON_D / 2;
+    const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 4.0);
+    put(moon, prism(P, front, mr, mi, BK_H, BK_H + h));
     moon.sil.classList.toggle("hi", h > H_FULL * 0.65);
   }
   drawMoon(hRest);
@@ -963,7 +988,7 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "moon",
-  means: "A round disc rises to a full dome while the pointer rests on it, then settles back.",
+  means: "A moon rises above an open book when the pointer rests on it, then settles back.",
   rules: [1, 4, 5, 8, 9],
   range: [1, 4, 9],
   tour: [[260, 135], [200, 162], [185, 175], null],

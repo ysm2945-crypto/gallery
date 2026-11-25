@@ -877,40 +877,32 @@ var HL = (() => {
 </script>
 <script type="module" id="hl-figure">
 /**
- * Dolls: three plush bears on a shelf. The pointer is projected onto the
- * shelf, and the nearest bear wobbles sideways on a spring — like a stuffed
- * animal nudged by a hand. When the pointer leaves, the bear settles back.
+ * Items: five desk objects on a shelf — umbrella, clock, doll, keyboard,
+ * tumbler. The pointer nudges the nearest item sideways on a spring.
+ * When the pointer leaves, the item settles back.
  * The slider is the wobble reach.
- *
- * Each bear: a wide rounded body, a round head overlapping the top of the
- * body, and two ear bumps rising above the head — one on the left side,
- * one on the right. All four parts of a bear share one spring so they
- * move as one piece.
  */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const N = 3, STEP = 22;
-const BW = 11, BD = 11, BH = 14;   // body width / depth / height
-const HW = 7.5, HD = 7.5, HH = 8; // head
-const EW = 3.0, ED = 3.0, EH = 3.5; // ear
+const N = 5, STEP = 16;
 const SHELF_H = 3, PB = 5;
-const BASE_W = N * STEP + 2, BASE_D = BD + 6;
-const SWAY = 8;
+const BASE_D = 13;
+const BASE_W = N * STEP + 2;
+const SWAY = 7;
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
   const C = Cam(45, 0.5, 1.68);
-  const maxH = SHELF_H + BH + HH + EH;
   fit(C, [
     [-PB, -PB, -PB],
     [BASE_W + SWAY + PB, BASE_D + PB, -PB],
     [BASE_W + SWAY + PB, -PB, -PB],
     [-PB, BASE_D + PB, -PB],
-    [0, 0, maxH],
-    [BASE_W + SWAY, BASE_D, maxH],
+    [0, 0, 34],
+    [BASE_W + SWAY, BASE_D, 34],
   ], 200, 166);
   const P = proj(C), front = facing(C);
   let R = value * STEP, over = null;
@@ -918,60 +910,127 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  // Shelf
+  // Shelf (fixed base)
   const [sr, si] = rings(-PB, -PB, BASE_W + PB, BASE_D + PB, 6, 1.6);
   put(solid(g), prism(P, front, sr, si, -PB, SHELF_H));
 
-  // Draw all four solids of one bear at world x = bx
-  function bearPrisms(bx, y0, bodyS, headS, earL, earR) {
-    // Body — wide rounded block
-    const [br, bi] = rings(bx, y0, bx + BW, y0 + BD, BW / 2 * 0.95, 2.0);
-    put(bodyS, prism(P, front, br, bi, SHELF_H, SHELF_H + BH));
+  function slotCX(i) { return i * STEP + STEP / 2; }
+  const CY = BASE_D / 2;
 
-    // Head — round, overlaps top of body
-    const hx0 = bx + (BW - HW) / 2, hy0 = y0 + (BD - HD) / 2;
-    const [hr, hi] = rings(hx0, hy0, hx0 + HW, hy0 + HD, HW / 2 * 0.95, 1.5);
-    put(headS, prism(P, front, hr, hi, SHELF_H + BH * 0.75, SHELF_H + BH + HH));
-
-    // Left ear: shifted in +y world direction → appears upper-left on screen.
-    // Its x+y centre (bx+5.5, y0+9.25) > head centre (bx+5.5, y0+5.5),
-    // so it is painted after the head and sits visibly on top.
-    const lx0 = bx + BW / 2 - EW / 2, ly0 = y0 + BD / 2 + HW * 0.3;
-    const [ler, lei] = rings(lx0, ly0, lx0 + EW, ly0 + ED, EW / 2 * 0.92, 0.4);
-    put(earL, prism(P, front, ler, lei, SHELF_H + BH + HH * 0.55, SHELF_H + BH + HH + EH));
-
-    // Right ear: shifted in +x world direction → appears upper-right on screen.
-    const rx0 = bx + BW / 2 + HW * 0.3, ry0 = y0 + BD / 2 - EW / 2;
-    const [rer, rei] = rings(rx0, ry0, rx0 + EW, ry0 + ED, EW / 2 * 0.92, 0.4);
-    put(earR, prism(P, front, rer, rei, SHELF_H + BH + HH * 0.55, SHELF_H + BH + HH + EH));
+  // --- Item 1: Umbrella (slot 0) — dome cap + thin stick ---
+  function drawUmbrella(ox, stickS, domeS) {
+    const cx = slotCX(0) + ox;
+    const sx0 = cx - 1, sy0 = CY - 1;
+    const [sr2, si2] = rings(sx0, sy0, sx0 + 2, sy0 + 2, 0.8, 0.4);
+    put(stickS, prism(P, front, sr2, si2, SHELF_H, SHELF_H + 24));
+    const dw = 10, dd = 7, dh = 5;
+    const dx0 = cx - dw / 2, dy0 = CY - dd / 2;
+    const [dr, di] = rings(dx0, dy0, dx0 + dw, dy0 + dd, Math.min(dw, dd) / 2 * 0.9, 2.0);
+    put(domeS, prism(P, front, dr, di, SHELF_H + 20, SHELF_H + 20 + dh));
+    domeS.sil.classList.toggle("hi", ox > SWAY * 0.4);
   }
+  const umbStickS = solid(g), umbDomeS = solid(g);
+  drawUmbrella(0, umbStickS, umbDomeS);
 
-  // Create three bears in ascending x+y order (back to front)
-  const bears = [];
-  for (let i = 0; i < N; i++) {
-    const x0 = i * STEP + (STEP - BW) / 2;
-    const y0 = (BASE_D - BD) / 2;
-    const bodyS = solid(g), headS = solid(g);
-    const earL = solid(g), earR = solid(g);
-    bearPrisms(x0, y0, bodyS, headS, earL, earR);
-    bears.push({
-      i, x0, y0,
-      sp: spring(0, { k: 65, c: 14, eps: 0.08 }),
-      bodyS, headS, earL, earR,
-      drawn: 0,
-    });
+  // --- Item 2: Clock (slot 1) — square base + round face ---
+  function drawClock(ox, baseS, faceS) {
+    const cx = slotCX(1) + ox;
+    const bw = 7, bd = 5, bh = 5;
+    const bx0 = cx - bw / 2, by0 = CY - bd / 2;
+    const [br, bi] = rings(bx0, by0, bx0 + bw, by0 + bd, 1.2, 1.0);
+    put(baseS, prism(P, front, br, bi, SHELF_H, SHELF_H + bh));
+    const rr = 3.5;
+    const fx0 = cx - rr, fy0 = CY - rr;
+    const [fr, fi] = rings(fx0, fy0, fx0 + rr * 2, fy0 + rr * 2, rr * 0.9, 1.4);
+    put(faceS, prism(P, front, fr, fi, SHELF_H + bh, SHELF_H + bh + 2.5));
+    faceS.sil.classList.add("hi");
   }
+  const clkBaseS = solid(g), clkFaceS = solid(g);
+  drawClock(0, clkBaseS, clkFaceS);
+
+  // --- Item 3: Doll / bear (slot 2) — body + head + ears ---
+  function drawDoll(ox, bodyS, headS, earLS, earRS) {
+    const cx = slotCX(2) + ox;
+    const bw = 7, bd = 7, bh = 10;
+    const bx0 = cx - bw / 2, by0 = CY - bd / 2;
+    const [br, bi] = rings(bx0, by0, bx0 + bw, by0 + bd, bw / 2 * 0.9, 1.8);
+    put(bodyS, prism(P, front, br, bi, SHELF_H, SHELF_H + bh));
+    const hw = 5.5, hd = 5.5, hh = 7;
+    const hx0 = cx - hw / 2, hy0 = CY - hd / 2;
+    const [hr, hi] = rings(hx0, hy0, hx0 + hw, hy0 + hd, hw / 2 * 0.9, 1.4);
+    put(headS, prism(P, front, hr, hi, SHELF_H + bh * 0.7, SHELF_H + bh + hh));
+    const ew = 2.4, ed = 2.4, eh = 2.8;
+    const lx0 = cx - 0.8, ly0 = CY + hd * 0.25;
+    const [ler, lei] = rings(lx0, ly0, lx0 + ew, ly0 + ed, ew / 2 * 0.88, 0.35);
+    put(earLS, prism(P, front, ler, lei, SHELF_H + bh + hh * 0.5, SHELF_H + bh + hh + eh));
+    const rx0 = cx + hw * 0.18, ry0 = CY - hd * 0.3;
+    const [rer, rei] = rings(rx0, ry0, rx0 + ew, ry0 + ed, ew / 2 * 0.88, 0.35);
+    put(earRS, prism(P, front, rer, rei, SHELF_H + bh + hh * 0.5, SHELF_H + bh + hh + eh));
+  }
+  const dBodyS = solid(g), dHeadS = solid(g), dEarLS = solid(g), dEarRS = solid(g);
+  drawDoll(0, dBodyS, dHeadS, dEarLS, dEarRS);
+
+  // --- Item 4: Keyboard (slot 3) — wide flat slab with key rows ---
+  function drawKeyboard(ox, slabS, row1S, row2S) {
+    const cx = slotCX(3) + ox;
+    const kw = 13, kd = 8, kh = 2.5;
+    const kx0 = cx - kw / 2, ky0 = CY - kd / 2;
+    const [kr, ki] = rings(kx0, ky0, kx0 + kw, ky0 + kd, 1.0, 1.2);
+    put(slabS, prism(P, front, kr, ki, SHELF_H, SHELF_H + kh));
+    // key row 1
+    const r1w = 10, r1d = 2, r1h = 1;
+    const r1x = cx - r1w / 2, r1y = ky0 + 1.5;
+    const [r1r, r1i] = rings(r1x, r1y, r1x + r1w, r1y + r1d, 0.5, 0.5);
+    put(row1S, prism(P, front, r1r, r1i, SHELF_H + kh, SHELF_H + kh + r1h));
+    row1S.sil.classList.add("hi");
+    // key row 2
+    const r2x = r1x, r2y = r1y + 3;
+    const [r2r, r2i] = rings(r2x, r2y, r2x + r1w, r2y + r1d, 0.5, 0.5);
+    put(row2S, prism(P, front, r2r, r2i, SHELF_H + kh, SHELF_H + kh + r1h));
+    row2S.sil.classList.toggle("hi", ox > SWAY * 0.4);
+  }
+  const kbSlabS = solid(g), kbRow1S = solid(g), kbRow2S = solid(g);
+  drawKeyboard(0, kbSlabS, kbRow1S, kbRow2S);
+
+  // --- Item 5: Tumbler (slot 4) — tall narrow cylinder + lid ---
+  function drawTumbler(ox, tubS, lidS) {
+    const cx = slotCX(4) + ox;
+    const tw = 4.5, td = 4.5, th = 22;
+    const tx0 = cx - tw / 2, ty0 = CY - td / 2;
+    const [tr, ti] = rings(tx0, ty0, tx0 + tw, ty0 + td, tw / 2 * 0.9, 1.0);
+    put(tubS, prism(P, front, tr, ti, SHELF_H, SHELF_H + th));
+    const lw = 4, ld = 4, lh = 2.5;
+    const lx0 = cx - lw / 2, ly0 = CY - ld / 2;
+    const [lr, li] = rings(lx0, ly0, lx0 + lw, ly0 + ld, lw / 2 * 0.9, 0.7);
+    put(lidS, prism(P, front, lr, li, SHELF_H + th, SHELF_H + th + lh));
+    lidS.sil.classList.add("hi");
+  }
+  const tubS = solid(g), lidS = solid(g);
+  drawTumbler(0, tubS, lidS);
+
+  // --- Items registry ---
+  const items = [
+    { i: 0, name: "umbrella", cx: slotCX(0), sp: spring(0, { k: 65, c: 14, eps: 0.08 }), drawn: 0,
+      redraw: (ox) => drawUmbrella(ox, umbStickS, umbDomeS) },
+    { i: 1, name: "clock",    cx: slotCX(1), sp: spring(0, { k: 65, c: 14, eps: 0.08 }), drawn: 0,
+      redraw: (ox) => drawClock(ox, clkBaseS, clkFaceS) },
+    { i: 2, name: "doll",     cx: slotCX(2), sp: spring(0, { k: 65, c: 14, eps: 0.08 }), drawn: 0,
+      redraw: (ox) => drawDoll(ox, dBodyS, dHeadS, dEarLS, dEarRS) },
+    { i: 3, name: "keyboard", cx: slotCX(3), sp: spring(0, { k: 65, c: 14, eps: 0.08 }), drawn: 0,
+      redraw: (ox) => drawKeyboard(ox, kbSlabS, kbRow1S, kbRow2S) },
+    { i: 4, name: "tumbler",  cx: slotCX(4), sp: spring(0, { k: 65, c: 14, eps: 0.08 }), drawn: 0,
+      redraw: (ox) => drawTumbler(ox, tubS, lidS) },
+  ];
 
   const B = register(stage, (dt) => {
     let m = false;
-    for (const b of bears) {
-      if (!stepS(b.sp, dt)) continue;
+    for (const it of items) {
+      if (!stepS(it.sp, dt)) continue;
       m = true;
-      const ox = b.sp.x;
-      if (Math.abs(ox - b.drawn) < 0.03) continue;
-      b.drawn = ox;
-      bearPrisms(b.x0 + ox, b.y0, b.bodyS, b.headS, b.earL, b.earR);
-      b.bodyS.sil.classList.toggle("hi", ox > SWAY * 0.5);
+      const ox = it.sp.x;
+      if (Math.abs(ox - it.drawn) < 0.03) continue;
+      it.drawn = ox;
+      it.redraw(ox);
     }
     return m;
   });
@@ -979,14 +1038,13 @@ function mount({ stage, svg, read }, value) {
 
   function retarget() {
     let nearest = null, nearD = Infinity;
-    for (const b of bears) {
-      if (!over) { b.sp.t = 0; continue; }
-      const cx = b.x0 + BW / 2, cy = b.y0 + BD / 2;
-      const d = Math.hypot(cx - over[0], cy - over[1]);
-      b.sp.t = SWAY * clamp(1 - d / R, 0, 1) ** 1.5;
-      if (d < nearD) { nearD = d; nearest = b; }
+    for (const it of items) {
+      if (!over) { it.sp.t = 0; continue; }
+      const d = Math.hypot(it.cx - over[0], CY - over[1]);
+      it.sp.t = SWAY * clamp(1 - d / R, 0, 1) ** 1.5;
+      if (d < nearD) { nearD = d; nearest = it; }
     }
-    read.textContent = nearest ? `bear ${nearest.i + 1}` : "still";
+    read.textContent = nearest ? nearest.name : "still";
     B.wake();
   }
 
@@ -1004,10 +1062,10 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "dolls",
-  means: "Three bears on a shelf wobble sideways when the pointer nudges them.",
+  means: "Five desk objects on a shelf wobble when the pointer nudges them.",
   rules: [1, 2, 3, 5, 8, 9],
   range: [1.5, 2.5, 4],
-  tour: [[130, 175], [215, 135], [295, 165], null],
+  tour: [[80, 175], [170, 135], [260, 160], null],
   mount,
 });
 </script>

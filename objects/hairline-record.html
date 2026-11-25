@@ -931,6 +931,19 @@ function mount({ stage, svg, read }, value) {
   put(label, prism(P, front, lr, li, H_DISC, H_LBL));
   label.sil.classList.add("hi");
 
+  // Tonearm: a thin rectangular prism angled from the back-right corner to the groove
+  const ARM_X0 = PB + D * 0.82, ARM_Y0 = PB + D * 0.04;
+  const ARM_X1 = PB + D * 0.82 + 2, ARM_Y1 = PB + D * 0.04 + 14;
+  const [ar, ai] = rings(ARM_X0, ARM_Y0, ARM_X1, ARM_Y1, 0.8, 0.5);
+  const armS = solid(g);
+  put(armS, prism(P, front, ar, ai, H_DISC, H_LBL + 1));
+  armS.sil.classList.add("hi");
+
+  // Tonearm pivot base (small rounded block at the top)
+  const PIV_D = 3.5;
+  const [pvr, pvi] = rings(ARM_X0 - 1, ARM_Y0 - 1, ARM_X0 + PIV_D, ARM_Y0 + PIV_D, 1.4, 0.8);
+  put(solid(g), prism(P, front, pvr, pvi, H_DISC, H_LBL + 2));
+
   // Groove marker dot (orbits around the disc)
   const mark = mk("g", {}, svg);
   const dot = flatDot(mark, C, 1.3, "dot m");

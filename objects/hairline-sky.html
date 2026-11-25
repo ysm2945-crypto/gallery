@@ -877,15 +877,11 @@ var HL = (() => {
 </script>
 <script type="module" id="hl-figure">
 /**
- * Sky: three clouds floating at different depths. The pointer is projected
- * onto the ground, and the nearest cloud drifts sideways on a spring —
- * like a cloud caught by a gust. When the pointer leaves, it settles back.
+ * Sky & Frame: a rectangular photo frame stands on a ground plate; three
+ * clouds float behind and around it. The pointer is projected onto the
+ * ground, and the nearest cloud drifts sideways on a spring — like a cloud
+ * caught by a gust. When the pointer leaves, it settles back.
  * The slider is the gust reach.
- *
- * Each cloud: a flat wide base slab (the flat bottom) with three round
- * domes on top — a shorter one on the left, the tallest in the centre,
- * and a medium one on the right. All four parts of a cloud share one
- * spring and drift as one piece.
  */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
@@ -894,12 +890,15 @@ const {
 
 // [x0, y0, cw, cd, h (centre dome), hL (left dome), hR (right dome)]
 const CLOUD_DATA = [
-  { x0:  4, y0:  4, cw: 18, cd: 10, h: 13, hL:  7, hR:  9 }, // small, back-left
-  { x0: 28, y0:  2, cw: 22, cd: 12, h: 16, hL:  9, hR: 11 }, // medium, back-right
-  { x0: 10, y0: 22, cw: 26, cd: 14, h: 21, hL: 12, hR: 15 }, // large, front
+  { x0:  2, y0:  3, cw: 16, cd:  9, h: 11, hL:  6, hR:  8 },
+  { x0: 28, y0:  2, cw: 20, cd: 11, h: 14, hL:  8, hR: 10 },
+  { x0:  8, y0: 20, cw: 24, cd: 13, h: 19, hL: 11, hR: 14 },
 ];
-const BASE_W = 56, BASE_D = 38, PB = 5;
-const DRIFT = 15, CLOUD_TOP = 24;
+const BASE_W = 54, BASE_D = 36, PB = 5;
+const DRIFT = 13, CLOUD_TOP = 22;
+// Photo frame: stands slightly left-of-centre, medium height
+const FR_X = 15, FR_Y = 10, FR_W = 18, FR_D = 3, FR_H = 20;
+const FR_INNER_MARGIN = 2.5;
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
@@ -922,36 +921,24 @@ function mount({ stage, svg, read }, value) {
   const [pr, pi] = rings(-PB, -PB, BASE_W + PB, BASE_D + PB, 8, 2.0);
   put(solid(g), prism(P, front, pr, pi, -PB, 0));
 
-  // Build clouds in ascending x+y centre order (back to front).
+  // Build clouds in ascending x+y centre order (back to front)
   const sorted = [...CLOUD_DATA].sort((a, b) =>
     (a.x0 + a.cw / 2 + a.y0 + a.cd / 2) - (b.x0 + b.cw / 2 + b.y0 + b.cd / 2)
   );
 
-  // Draw all four solids of one cloud at world x offset ox.
-  // Order: base → left dome → centre dome → right dome.
-  // The right dome (largest x, largest x+y) is appended last and covers
-  // the overlapping region between right and centre, as expected for depth.
   function cloudPrisms(d, ox, baseS, leftS, centreS, rightS) {
     const bx = d.x0 + ox;
-
-    // Base slab — flat bottom of the cloud
     const bR = Math.min(d.cw, d.cd) / 4;
     const [br, bi] = rings(bx, d.y0, bx + d.cw, d.y0 + d.cd, bR, 1.2);
     put(baseS, prism(P, front, br, bi, 0, 2));
-
-    // Left dome (screen-left; smaller x → upper-left in iso view)
     const lx0 = bx, ly0 = d.y0 + 1, lx1 = bx + d.cw * 0.46, ly1 = d.y0 + d.cd - 1;
     const lR = Math.min(lx1 - lx0, ly1 - ly0) / 2 * 0.92;
     const [lr, li] = rings(lx0, ly0, lx1, ly1, lR, 2.0);
     put(leftS, prism(P, front, lr, li, 2, 2 + d.hL));
-
-    // Centre dome (tallest)
     const cx0 = bx + d.cw * 0.2, cy0 = d.y0, cx1 = bx + d.cw * 0.8, cy1 = d.y0 + d.cd;
     const cR = Math.min(cx1 - cx0, cy1 - cy0) / 2 * 0.92;
     const [cr, ci] = rings(cx0, cy0, cx1, cy1, cR, 2.0);
     put(centreS, prism(P, front, cr, ci, 2, 2 + d.h));
-
-    // Right dome (screen-right; larger x → upper-right in iso view)
     const rx0 = bx + d.cw * 0.54, ry0 = d.y0 + 1, rx1 = bx + d.cw, ry1 = d.y0 + d.cd - 1;
     const rR = Math.min(rx1 - rx0, ry1 - ry0) / 2 * 0.92;
     const [rr, ri] = rings(rx0, ry0, rx1, ry1, rR, 2.0);
@@ -969,6 +956,18 @@ function mount({ stage, svg, read }, value) {
       drawn: 0,
     };
   });
+
+  // Photo frame — outer slab (thick border)
+  const [fro, foi] = rings(FR_X, FR_Y, FR_X + FR_W, FR_Y + FR_D, 1.5, 1.4);
+  const frameS = solid(g);
+  put(frameS, prism(P, front, fro, foi, 0, FR_H));
+  frameS.sil.classList.add("hi");
+
+  // Frame inner window (recessed, slightly smaller)
+  const ix0 = FR_X + FR_INNER_MARGIN, iy0 = FR_Y + 0.5;
+  const ix1 = FR_X + FR_W - FR_INNER_MARGIN, iy1 = FR_Y + FR_D - 0.5;
+  const [fri, fii] = rings(ix0, iy0, ix1, iy1, 0.8, 0.6);
+  put(solid(g), prism(P, front, fri, fii, FR_H * 0.15, FR_H * 0.85));
 
   const B = register(stage, (dt) => {
     let m = false;
@@ -1012,7 +1011,7 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "sky",
-  means: "Three clouds drift sideways when the pointer sweeps over them.",
+  means: "Three clouds drift past a photo frame — a sky seen through a viewfinder.",
   rules: [1, 2, 3, 5, 8, 9],
   range: [2, 3.5, 5],
   tour: [[110, 155], [255, 108], [188, 207], null],

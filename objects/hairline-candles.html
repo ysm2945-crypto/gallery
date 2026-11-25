@@ -877,69 +877,75 @@ var HL = (() => {
 </script>
 <script type="module" id="hl-figure">
 /**
- * Candles: seven candles of different heights on a cake base. The pointer is
- * projected onto the top of the base, and nearby flames drift sideways on
- * springs — like candles caught by a breath. At rest, the row of heights
- * composes a gentle silhouette.
- * The slider is the gust radius, in cells.
- *
- * The pattern: discrete items as a row. Springs on flame x-offset,
- * distance falloff, hit test on the cake top (which never moves).
+ * Candles: three candles on a two-tiered birthday cake. The pointer is
+ * projected onto the top tier, and nearby flames sway sideways on springs —
+ * like candles caught by a breath. At rest the three flames sit still.
+ * The slider is the sway radius.
  */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const N = 7, STEP = 12, CW = 3, CD = 3;
-const BASE_W = N * STEP + 2, BASE_D = 10, BASE_H = 4, PB = 5;
-const HEIGHTS = [13, 20, 10, 24, 15, 19, 12];
+const N = 3, STEP = 18, CW = 3.2, CD = 3.2;
+const T1W = 54, T1D = 16, T1H = 9;   // bottom tier
+const T2W = 36, T2D = 11, T2H = 6;   // top tier
+const T2X = (T1W - T2W) / 2, T2Y = (T1D - T2D) / 2;
+const C_BASE = T1H + T2H;
+const HEIGHTS = [18, 24, 18];
 const FW = 2.4, FD = 2.4, FH = 7;
-const SWAY = 11;
+const PB = 5, SWAY = 10;
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  const maxH = Math.max(...HEIGHTS) + FH;
+  const maxH = C_BASE + Math.max(...HEIGHTS) + FH;
   const C = Cam(45, 0.5, 1.68);
   fit(C, [
     [-PB, -PB, -PB],
-    [BASE_W + SWAY + PB, BASE_D + PB, -PB],
-    [BASE_W + SWAY + PB, -PB, -PB],
-    [-PB, BASE_D + PB, -PB],
+    [T1W + SWAY + PB, T1D + PB, -PB],
+    [T1W + SWAY + PB, -PB, -PB],
+    [-PB, T1D + PB, -PB],
     [0, 0, maxH],
-    [BASE_W, 0, maxH],
-    [0, BASE_D, maxH],
-    [BASE_W + SWAY, BASE_D, maxH],
+    [T1W + SWAY, 0, maxH],
+    [0, T1D, maxH],
+    [T1W + SWAY, T1D, maxH],
   ], 200, 166);
   const P = proj(C), front = facing(C);
   let R = value * STEP, over = null;
 
   const g = mk("g", {}, svg);
 
-  // Cake base (fixed, painted first — farthest layer)
-  const [br, bi] = rings(-PB, -PB, BASE_W + PB, BASE_D + PB, 6, 1.6);
-  put(solid(g), prism(P, front, br, bi, -PB, BASE_H));
+  // Bottom cake tier
+  const [b1r, b1i] = rings(-PB, -PB, T1W + PB, T1D + PB, 7, 1.8);
+  put(solid(g), prism(P, front, b1r, b1i, -PB, T1H));
 
-  // Candles in left-to-right order (ascending x + y is the front-to-back order here).
-  // Each candle: body then flame, so the flame sits atop its own body in the paint order.
+  // Top cake tier (centred on bottom)
+  const [b2r, b2i] = rings(T2X, T2Y, T2X + T2W, T2Y + T2D, 5, 1.6);
+  put(solid(g), prism(P, front, b2r, b2i, T1H, T1H + T2H));
+
+  // Three candles evenly spaced on the top tier
   const candles = [];
   for (let i = 0; i < N; i++) {
-    const x0 = i * STEP + (STEP - CW) / 2;
-    const y0 = (BASE_D - CD) / 2;
+    const x0 = T2X + (i + 0.5) * (T2W / N) - CW / 2;
+    const y0 = T2Y + (T2D - CD) / 2;
     const h = HEIGHTS[i];
 
-    // Candle body: drawn once, never moves
+    // Candle body (fixed)
     const [cr, ci] = rings(x0, y0, x0 + CW, y0 + CD, 1.2, 0.5);
-    put(solid(g), prism(P, front, cr, ci, BASE_H, BASE_H + h));
+    put(solid(g), prism(P, front, cr, ci, C_BASE, C_BASE + h));
 
-    // Flame solid: redrawn when spring changes
+    // Flame solid (animated)
     const flSolid = solid(g);
     const fx0 = x0 + (CW - FW) / 2, fy0 = y0 + (CD - FD) / 2;
     const [fr, fi] = rings(fx0, fy0, fx0 + FW, fy0 + FD, 1.0, 0.4);
-    put(flSolid, prism(P, front, fr, fi, BASE_H + h, BASE_H + h + FH));
+    put(flSolid, prism(P, front, fr, fi, C_BASE + h, C_BASE + h + FH));
     flSolid.sil.classList.add("hi");
 
-    candles.push({ i, x0, y0, h, sp: spring(0, { k: 60, c: 14, eps: 0.08 }), fl: flSolid, drawn: 0 });
+    candles.push({
+      i, x0, y0, h,
+      sp: spring(0, { k: 60, c: 14, eps: 0.08 }),
+      fl: flSolid, drawn: 0,
+    });
   }
 
   const B = register(stage, (dt) => {
@@ -952,7 +958,7 @@ function mount({ stage, svg, read }, value) {
       c.drawn = ox;
       const fx0 = c.x0 + (CW - FW) / 2 + ox, fy0 = c.y0 + (CD - FD) / 2;
       const [fr, fi] = rings(fx0, fy0, fx0 + FW, fy0 + FD, 1.0, 0.4);
-      put(c.fl, prism(P, front, fr, fi, BASE_H + c.h, BASE_H + c.h + FH));
+      put(c.fl, prism(P, front, fr, fi, C_BASE + c.h, C_BASE + c.h + FH));
     }
     return m;
   });
@@ -972,7 +978,7 @@ function mount({ stage, svg, read }, value) {
   }
 
   bag.add(pointer(stage, {
-    move: (p) => { over = unproj(C, p[0], p[1], BASE_H); retarget(); },
+    move: (p) => { over = unproj(C, p[0], p[1], C_BASE); retarget(); },
     leave: () => { over = null; retarget(); },
   }));
   bag.add(() => svg.replaceChildren());
@@ -985,9 +991,9 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "candles",
-  means: "Seven candles on a cake: the flames near the pointer sway sideways.",
+  means: "Three candles on a birthday cake — the flames near the pointer sway sideways.",
   rules: [1, 2, 3, 5, 8, 9],
-  range: [2, 3.5, 5],
+  range: [1.5, 2.5, 4],
   tour: [[130, 175], [215, 130], [295, 155], null],
   mount,
 });

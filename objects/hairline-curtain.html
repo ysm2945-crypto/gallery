@@ -877,14 +877,11 @@ var HL = (() => {
 </script>
 <script type="module" id="hl-figure">
 /**
- * Curtain: eight fabric folds hanging from a narrow rail. The pointer is
- * projected onto the rail top, and nearby folds drift sideways on springs —
- * like soft cloth caught by a hand sliding past. At rest the fold heights
- * shape a gentle hem.
+ * Curtain & Window: eight fabric folds hang from a rail set inside a simple
+ * window frame — two side pillars and a top lintel. The pointer is projected
+ * onto the rail top, and nearby folds drift sideways on springs — like soft
+ * cloth caught by a hand. When the pointer leaves, folds settle back.
  * The slider is the reach radius, in cells.
- *
- * The pattern: discrete items as a row. Springs on x-offset,
- * distance falloff, hit test on the rail top (which never moves).
  */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
@@ -896,31 +893,46 @@ const HEIGHTS = [26, 32, 28, 34, 29, 33, 27, 31];
 const RAIL_H = 3, RAIL_D = FD + 2;
 const BASE_W = N * STEP + 2;
 const SWAY = 14;
+// Window frame geometry
+const PIL_W = 5, PIL_D = RAIL_D + 4;   // side pillars width/depth
+const LIN_H = 5;                        // lintel (top bar) height
+const WIN_X = -PIL_W, WIN_Y = -2;       // frame starts left of curtain area
+const WIN_W = BASE_W + PIL_W * 2;       // total window width
+const FRAME_TOP = Math.max(...HEIGHTS) + RAIL_H + LIN_H;
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
   const maxH = Math.max(...HEIGHTS);
   const C = Cam(45, 0.5, 1.56);
   fit(C, [
-    [-PB, -PB, -PB],
-    [BASE_W + SWAY + PB, RAIL_D + PB, -PB],
-    [BASE_W + SWAY + PB, -PB, -PB],
-    [-PB, RAIL_D + PB, -PB],
-    [0, 0, RAIL_H + maxH],
-    [BASE_W + SWAY, 0, RAIL_H + maxH],
-    [0, RAIL_D, RAIL_H + maxH],
-    [BASE_W + SWAY, RAIL_D, RAIL_H + maxH],
+    [WIN_X - PB, WIN_Y - PB, -PB],
+    [WIN_X + WIN_W + SWAY + PB, PIL_D + PB, -PB],
+    [WIN_X + WIN_W + SWAY + PB, WIN_Y - PB, -PB],
+    [WIN_X - PB, PIL_D + PB, -PB],
+    [0, 0, FRAME_TOP],
+    [BASE_W + SWAY, 0, FRAME_TOP],
+    [0, PIL_D, FRAME_TOP],
+    [BASE_W + SWAY, PIL_D, FRAME_TOP],
   ], 200, 162);
   const P = proj(C), front = facing(C);
   let R = value * STEP, over = null;
 
   const g = mk("g", {}, svg);
 
-  // Curtain rail (fixed)
+  // Left pillar
+  const [lpr, lpi] = rings(WIN_X, WIN_Y, WIN_X + PIL_W, WIN_Y + PIL_D, 2.0, 1.4);
+  put(solid(g), prism(P, front, lpr, lpi, -PB, FRAME_TOP - LIN_H));
+
+  // Right pillar
+  const RPX = BASE_W;
+  const [rpr, rpi] = rings(RPX, WIN_Y, RPX + PIL_W, WIN_Y + PIL_D, 2.0, 1.4);
+  put(solid(g), prism(P, front, rpr, rpi, -PB, FRAME_TOP - LIN_H));
+
+  // Curtain rail (fixed, sits inside window)
   const [rr, ri] = rings(-PB, -PB, BASE_W + PB, RAIL_D + PB, 4, 1.2);
   put(solid(g), prism(P, front, rr, ri, -PB, RAIL_H));
 
-  // Folds: tall narrow prisms, left to right (ascending x+y = back to front)
+  // Folds: tall narrow prisms
   const folds = [];
   for (let i = 0; i < N; i++) {
     const x0 = i * STEP + (STEP - FW) / 2;
@@ -931,6 +943,13 @@ function mount({ stage, svg, read }, value) {
     put(sw, prism(P, front, fr, fi, RAIL_H, RAIL_H + h));
     folds.push({ i, x0, y0, h, sp: spring(0, { k: 50, c: 12, eps: 0.08 }), sw, drawn: 0 });
   }
+
+  // Top lintel (painted after folds so it sits on top)
+  const linY = WIN_Y;
+  const [lnr, lni] = rings(WIN_X, linY, WIN_X + WIN_W, linY + PIL_D, 2.0, 1.6);
+  const lintelS = solid(g);
+  put(lintelS, prism(P, front, lnr, lni, FRAME_TOP - LIN_H, FRAME_TOP));
+  lintelS.sil.classList.add("hi");
 
   const B = register(stage, (dt) => {
     let m = false;
@@ -976,7 +995,7 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "curtain",
-  means: "Eight fabric folds hang from a rail: the ones near the pointer drift sideways.",
+  means: "Curtain folds hang inside a window frame and drift when the pointer sweeps past.",
   rules: [1, 2, 3, 5, 8, 9],
   range: [2, 3.5, 5],
   tour: [[120, 165], [220, 125], [310, 155], null],
