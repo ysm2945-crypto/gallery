@@ -881,29 +881,32 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const BASE_W = 68, BASE_D = 12, PB = 5;
+// 4 frames that fill the wall — deeper (more 3D-looking), taller
+const BASE_W = 68, BASE_D = 16, PB = 4;
 const SWAY = 7;
 
+// [x, fw, fh, fd] — varied sizes, good depth for 3D read
 const FRAME_DATA = [
-  { x: 2,  fw: 13, fh: 26, fd: 2.5 },
-  { x: 18, fw: 17, fh: 16, fd: 2.5 },
-  { x: 38, fw: 11, fh: 22, fd: 2.5 },
-  { x: 53, fw: 13, fh: 18, fd: 2.5 },
+  { x: 2,  fw: 14, fh: 28, fd: 5 },
+  { x: 19, fw: 18, fh: 18, fd: 5 },
+  { x: 41, fw: 12, fh: 24, fd: 5 },
+  { x: 55, fw: 11, fh: 20, fd: 5 },
 ];
 
 function drawFrame(P, front, f, ox, outerS, innerS) {
   const y0 = (BASE_D - f.fd) / 2;
-  const [or, oi] = rings(f.x + ox, y0, f.x + f.fw + ox, y0 + f.fd, 1.0, 0.7);
+  const [or, oi] = rings(f.x + ox, y0, f.x + f.fw + ox, y0 + f.fd, 1.4, 0.9);
   put(outerS, prism(P, front, or, oi, 0, f.fh));
   outerS.sil.classList.add("hi");
-  const m = 1.8;
-  const [ir, ii] = rings(f.x + m + ox, y0 + 0.3, f.x + f.fw - m + ox, y0 + f.fd - 0.3, 0.3, 0.3);
+  // Inner window — clearly inset from all sides
+  const m = 2.2;
+  const [ir, ii] = rings(f.x + m + ox, y0 + 0.6, f.x + f.fw - m + ox, y0 + f.fd - 0.6, 0.5, 0.4);
   put(innerS, prism(P, front, ir, ii, m, f.fh - m));
 }
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  const C = Cam(45, 0.5, 1.72);
+  const C = Cam(45, 0.5, 1.68);
   const maxH = Math.max(...FRAME_DATA.map(f => f.fh));
   fit(C, [
     [-PB, -PB, -PB],
@@ -919,7 +922,8 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  const [pr, pi] = rings(-PB, -PB, BASE_W + PB, BASE_D + PB, 6, 1.6);
+  // Wall shelf (thin, low)
+  const [pr, pi] = rings(-PB, -PB, BASE_W + PB, BASE_D + PB, 5, 1.4);
   put(solid(g), prism(P, front, pr, pi, -PB, 0));
 
   const frames = FRAME_DATA.map((f, i) => {
@@ -928,7 +932,7 @@ function mount({ stage, svg, read }, value) {
     return {
       i, cx: f.x + f.fw / 2,
       outerS, innerS, _f: f,
-      sp: spring(0, { k: 55, c: 12, eps: 0.08 }),
+      sp: spring(0, { k: 50, c: 11, eps: 0.08 }),
       drawn: 0,
     };
   });

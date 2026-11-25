@@ -881,29 +881,29 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const BASE_W = 54, BASE_D = 54, PB = 6;
-const CX = BASE_W / 2, CY = BASE_D / 2;
-const MOON_D = 42, MOON_H = 6;
-const LIQ_MAX = 14;
+// Moon fills the canvas — no flat base plate, just the moon disc
+const MOON_D = 50, MOON_H = 22, PB = 4;
+const CX = MOON_D / 2 + PB, CY = MOON_D / 2 + PB;
+const LIQ_MAX = 20;
 
 const CRATERS = [
-  { rx: -10, ry: -6,  d: 7 },
-  { rx:  8,  ry:  7,  d: 5 },
-  { rx: -5,  ry: 10,  d: 6 },
-  { rx:  7,  ry: -10, d: 4 },
-  { rx: -1,  ry:  1,  d: 9 },
+  { rx: -12, ry: -7,  d: 10 },
+  { rx:  10, ry:  9,  d:  7 },
+  { rx:  -6, ry: 11,  d:  8 },
+  { rx:   8, ry: -12, d:  6 },
+  { rx:  -1, ry:  1,  d: 13 },
 ];
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
   const C = Cam(45, 0.5, 1.84);
+  const liqD = MOON_D - 8;
+  const lx0 = CX - liqD / 2, ly0 = CY - liqD / 2;
   fit(C, [
-    [0, 0, -PB],
-    [BASE_W, BASE_D, -PB],
-    [BASE_W, 0, -PB],
-    [0, BASE_D, -PB],
-    [0, 0, MOON_H + LIQ_MAX + 2],
-    [BASE_W, BASE_D, MOON_H + LIQ_MAX + 2],
+    [CX - MOON_D / 2 - PB, CY - MOON_D / 2 - PB, -PB],
+    [CX + MOON_D / 2 + PB, CY + MOON_D / 2 + PB, -PB],
+    [CX - MOON_D / 2, CY - MOON_D / 2, MOON_H + LIQ_MAX + 6],
+    [CX + MOON_D / 2, CY + MOON_D / 2, MOON_H + LIQ_MAX + 6],
   ], 200, 162);
   const P = proj(C), front = facing(C);
   const sp = spring(0, { k: 22, c: 7, eps: 0.04 });
@@ -912,32 +912,31 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 1.5);
-  put(solid(g), prism(P, front, pr, pi, -PB, 0));
-
+  // Moon disc — large, fills canvas
   const mx0 = CX - MOON_D / 2, my0 = CY - MOON_D / 2;
-  const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 4.0);
+  const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 4.5);
   const moonS = solid(g);
   put(moonS, prism(P, front, mr, mi, 0, MOON_H));
   moonS.sil.classList.add("hi");
 
+  // Craters — prominent bumps on the moon face
   for (const c of CRATERS) {
     const cx0 = CX + c.rx - c.d / 2, cy0 = CY + c.ry - c.d / 2;
-    const [cr, ci] = rings(cx0, cy0, cx0 + c.d, cy0 + c.d, c.d / 2 * 0.9, 1.4);
-    put(solid(g), prism(P, front, cr, ci, MOON_H, MOON_H + 2));
+    const [cr, ci] = rings(cx0, cy0, cx0 + c.d, cy0 + c.d, c.d / 2 * 0.9, 1.6);
+    put(solid(g), prism(P, front, cr, ci, MOON_H, MOON_H + 2.5));
   }
 
-  const liqD = MOON_D - 6;
-  const lx0 = CX - liqD / 2, ly0 = CY - liqD / 2;
+  // Liquid that rises inside
   const liqS = solid(g);
+  let drawn = -1;
+
   function drawLiq(h) {
-    if (h < 0.1) { put(liqS, prism(P, front, [], [], 0, 0)); return; }
+    const h2 = Math.max(h, 0.01);
     const [lr, li] = rings(lx0, ly0, lx0 + liqD, ly0 + liqD, liqD / 2, 3.5);
-    put(liqS, prism(P, front, lr, li, 0, h));
-    liqS.sil.classList.toggle("hi", h > LIQ_MAX * 0.6);
+    put(liqS, prism(P, front, lr, li, 0, h2));
+    liqS.sil.classList.toggle("hi", h > LIQ_MAX * 0.55);
   }
-  drawLiq(0);
-  let drawn = 0;
+  drawLiq(0.01);
 
   const B = register(stage, (dt) => {
     if (!stepS(sp, dt)) return false;
@@ -945,7 +944,7 @@ function mount({ stage, svg, read }, value) {
     if (Math.abs(h - drawn) < 0.04) return false;
     drawn = h;
     drawLiq(h);
-    read.textContent = h > LIQ_MAX * 0.75 ? "rising" : h > 0.1 ? "filling" : "moon";
+    read.textContent = h > LIQ_MAX * 0.75 ? "rising" : h > 0.5 ? "filling" : "moon";
     return true;
   });
   bag.add(B.unregister);
@@ -955,7 +954,7 @@ function mount({ stage, svg, read }, value) {
       if (!over) { over = true; sp.t = LIQ_MAX; B.wake(); }
     },
     leave: () => {
-      if (over) { over = false; sp.t = 0; B.wake(); }
+      if (over) { over = false; sp.t = 0.01; B.wake(); }
     },
   }));
   bag.add(() => svg.replaceChildren());

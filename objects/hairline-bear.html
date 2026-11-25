@@ -881,47 +881,56 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const TABLE_W = 50, TABLE_D = 24, TABLE_H = 4, PB = 5;
+// Bear fills the canvas — small table, large bear
+const TABLE_W = 36, TABLE_D = 22, TABLE_H = 4, PB = 4;
+const SWAY = 6;
 const BASE_W = TABLE_W + PB * 2, BASE_D = TABLE_D + PB * 2;
 const CX = BASE_W / 2, CY = BASE_D / 2;
-const SWAY = 7;
 
-const BW = 18, BD = 14, BH = 22;
-const HW = 14, HD = 13, HH = 16;
-const EW = 5, ED = 5, EH = 5;
-const AW = 8, AD = 5, AH = 3;
+// Large bear proportions
+const BW = 22, BD = 16, BH = 24;
+const HW = 18, HD = 15, HH = 20;
+const EW = 6.5, ED = 6.5, EH = 6;
+const AW = 9, AD = 6, AH = 4;
 
 function drawBear(P, front, ox, bodyS, headS, earLS, earRS, armLS, armRS) {
   const bcx = CX + ox;
+
+  // Body — large rounded oval
   const bx0 = bcx - BW / 2, by0 = CY - BD / 2;
-  const [br, bi] = rings(bx0, by0, bx0 + BW, by0 + BD, BW / 2 * 0.88, 2.0);
+  const [br, bi] = rings(bx0, by0, bx0 + BW, by0 + BD, BW / 2 * 0.86, 2.2);
   put(bodyS, prism(P, front, br, bi, TABLE_H, TABLE_H + BH));
 
+  // Head — round, slightly smaller
   const hx0 = bcx - HW / 2, hy0 = CY - HD / 2;
-  const [hr, hi] = rings(hx0, hy0, hx0 + HW, hy0 + HD, HW / 2 * 0.88, 1.8);
-  put(headS, prism(P, front, hr, hi, TABLE_H + BH * 0.72, TABLE_H + BH + HH));
+  const [hr, hi] = rings(hx0, hy0, hx0 + HW, hy0 + HD, HW / 2 * 0.86, 2.0);
+  put(headS, prism(P, front, hr, hi, TABLE_H + BH * 0.68, TABLE_H + BH + HH));
   headS.sil.classList.add("hi");
 
-  const lx0 = bcx - HW * 0.1, ly0 = CY + HD * 0.22;
-  const [ler, lei] = rings(lx0, ly0, lx0 + EW, ly0 + ED, EW / 2 * 0.86, 0.5);
-  put(earLS, prism(P, front, ler, lei, TABLE_H + BH + HH * 0.52, TABLE_H + BH + HH + EH));
+  // Left ear
+  const lx0 = bcx - HW * 0.08, ly0 = CY + HD * 0.20;
+  const [ler, lei] = rings(lx0, ly0, lx0 + EW, ly0 + ED, EW / 2 * 0.86, 0.6);
+  put(earLS, prism(P, front, ler, lei, TABLE_H + BH + HH * 0.48, TABLE_H + BH + HH + EH));
 
-  const rx0 = bcx + HW * 0.1 - EW * 0.3, ry0 = CY - HD * 0.52;
-  const [rer, rei] = rings(rx0, ry0, rx0 + EW, ry0 + ED, EW / 2 * 0.86, 0.5);
-  put(earRS, prism(P, front, rer, rei, TABLE_H + BH + HH * 0.52, TABLE_H + BH + HH + EH));
+  // Right ear
+  const rx0 = bcx + HW * 0.08 - EW * 0.4, ry0 = CY - HD * 0.52;
+  const [rer, rei] = rings(rx0, ry0, rx0 + EW, ry0 + ED, EW / 2 * 0.86, 0.6);
+  put(earRS, prism(P, front, rer, rei, TABLE_H + BH + HH * 0.48, TABLE_H + BH + HH + EH));
 
-  const lax0 = bcx - BW / 2 - AW * 0.6, lay0 = CY - AD / 2;
-  const [lar, lai] = rings(lax0, lay0, lax0 + AW, lay0 + AD, 1.5, 1.0);
-  put(armLS, prism(P, front, lar, lai, TABLE_H + BH * 0.3, TABLE_H + BH * 0.3 + AH));
+  // Left arm — stubby, low on body
+  const lax0 = bcx - BW / 2 - AW * 0.5, lay0 = CY - AD / 2 + 1;
+  const [lar, lai] = rings(lax0, lay0, lax0 + AW, lay0 + AD, 1.8, 1.0);
+  put(armLS, prism(P, front, lar, lai, TABLE_H + BH * 0.25, TABLE_H + BH * 0.25 + AH));
 
-  const rax0 = bcx + BW / 2 - AW * 0.4, ray0 = CY - AD / 2;
-  const [rar, rai] = rings(rax0, ray0, rax0 + AW, ray0 + AD, 1.5, 1.0);
-  put(armRS, prism(P, front, rar, rai, TABLE_H + BH * 0.3, TABLE_H + BH * 0.3 + AH));
+  // Right arm
+  const rax0 = bcx + BW / 2 - AW * 0.5, ray0 = CY - AD / 2 - 1;
+  const [rar, rai] = rings(rax0, ray0, rax0 + AW, ray0 + AD, 1.8, 1.0);
+  put(armRS, prism(P, front, rar, rai, TABLE_H + BH * 0.25, TABLE_H + BH * 0.25 + AH));
 }
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  const C = Cam(45, 0.5, 1.72);
+  const C = Cam(45, 0.5, 1.68);
   const totalH = TABLE_H + BH + HH + EH + 2;
   fit(C, [
     [0, 0, -PB],
@@ -938,7 +947,8 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  const [tr, ti] = rings(PB, PB, PB + TABLE_W, PB + TABLE_D, 6, 1.6);
+  // Table — just a bit wider than the bear
+  const [tr, ti] = rings(PB, PB, PB + TABLE_W, PB + TABLE_D, 5, 1.5);
   put(solid(g), prism(P, front, tr, ti, -PB, TABLE_H));
 
   const bodyS = solid(g), headS = solid(g);
@@ -968,9 +978,7 @@ function mount({ stage, svg, read }, value) {
       B.wake();
     },
     leave: () => {
-      over = false;
-      sp.t = 0;
-      B.wake();
+      over = false; sp.t = 0; B.wake();
     },
   }));
   bag.add(() => svg.replaceChildren());

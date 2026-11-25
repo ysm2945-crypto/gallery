@@ -881,20 +881,20 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const BASE_W = 58, BASE_D = 58, PB = 7;
-const CX = BASE_W / 2, CY = BASE_D / 2;
-const DISC_D = 46, DISC_H = 3;
-const LABEL_D = 12, LABEL_H = 2;
-const NOTE_JUMP = 12;
+// Record fills canvas — fit tightly around disc
+const DISC_D = 50, DISC_H = 14, PB = 4;
+const LABEL_D = 14, LABEL_H = 2.5;
+const NOTE_JUMP = 14;
 const PERIOD = 0.28;
+const CX = DISC_D / 2 + PB, CY = DISC_D / 2 + PB;
 
 const NOTE_POS = [
-  { rx: -14, ry: -8,  hw: 4, hd: 3.5, sh: 9  },
-  { rx:  2,  ry: -16, hw: 3.5, hd: 3, sh: 8  },
-  { rx:  13, ry:  -4, hw: 4,  hd: 4,  sh: 11 },
-  { rx:  10, ry:  12, hw: 3.5, hd: 3, sh: 7  },
-  { rx: -5,  ry:  14, hw: 4,  hd: 3.5, sh: 10 },
-  { rx: -15, ry:  6,  hw: 3,  hd: 3,  sh: 8  },
+  { rx: -14, ry: -8,  hw: 5,   hd: 4,  sh: 11 },
+  { rx:  2,  ry: -18, hw: 4.5, hd: 3.5, sh: 10 },
+  { rx:  16, ry:  -4, hw: 5,   hd: 4.5, sh: 12 },
+  { rx:  12, ry:  13, hw: 4.5, hd: 3.5, sh: 9  },
+  { rx:  -4, ry:  16, hw: 5,   hd: 4,  sh: 11 },
+  { rx: -17, ry:   6, hw: 4,   hd: 3.5, sh: 10 },
 ];
 const N_NOTES = NOTE_POS.length;
 
@@ -902,13 +902,13 @@ function drawNote(P, front, np, oz, headS, stemS) {
   const baseZ = DISC_H + LABEL_H;
   const hcx = CX + np.rx, hcy = CY + np.ry;
   const hx0 = hcx - np.hw / 2, hy0 = hcy - np.hd / 2;
-  const [hr, hi] = rings(hx0, hy0, hx0 + np.hw, hy0 + np.hd, np.hw / 2 * 0.88, 1.2);
-  put(headS, prism(P, front, hr, hi, baseZ + oz, baseZ + oz + 2.5));
+  const [hr, hi] = rings(hx0, hy0, hx0 + np.hw, hy0 + np.hd, np.hw / 2 * 0.86, 1.4);
+  put(headS, prism(P, front, hr, hi, baseZ + oz, baseZ + oz + 3));
   headS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
 
-  const sx0 = hcx - 0.7, sy0 = hcy - 0.7;
-  const [sr, si] = rings(sx0, sy0, sx0 + 1.4, sy0 + 1.4, 0.4, 0.4);
-  put(stemS, prism(P, front, sr, si, baseZ + oz + 2.5, baseZ + oz + 2.5 + np.sh));
+  const sx0 = hcx - 0.9, sy0 = hcy - 0.9;
+  const [sr, si] = rings(sx0, sy0, sx0 + 1.8, sy0 + 1.8, 0.5, 0.4);
+  put(stemS, prism(P, front, sr, si, baseZ + oz + 3, baseZ + oz + 3 + np.sh));
   stemS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
 }
 
@@ -916,12 +916,10 @@ function mount({ stage, svg, read }, value) {
   const bag = disposer();
   const C = Cam(45, 0.5, 1.80);
   fit(C, [
-    [0, 0, -PB],
-    [BASE_W, BASE_D, -PB],
-    [BASE_W, 0, -PB],
-    [0, BASE_D, -PB],
-    [0, 0, DISC_H + LABEL_H + NOTE_JUMP + 14],
-    [BASE_W, BASE_D, DISC_H + LABEL_H + NOTE_JUMP + 14],
+    [CX - DISC_D / 2 - PB, CY - DISC_D / 2 - PB, -PB],
+    [CX + DISC_D / 2 + PB, CY + DISC_D / 2 + PB, -PB],
+    [CX - DISC_D / 2, CY - DISC_D / 2, DISC_H + LABEL_H + NOTE_JUMP + 20],
+    [CX + DISC_D / 2, CY + DISC_D / 2, DISC_H + LABEL_H + NOTE_JUMP + 20],
   ], 200, 162);
   const P = proj(C), front = facing(C);
   let hoverTime = 0, over = false;
@@ -929,19 +927,19 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 1.5);
-  put(solid(g), prism(P, front, pr, pi, -PB, 0));
-
+  // Record disc — large, hi class
   const dx0 = CX - DISC_D / 2, dy0 = CY - DISC_D / 2;
-  const [dr, di] = rings(dx0, dy0, dx0 + DISC_D, dy0 + DISC_D, DISC_D / 2, 4.0);
+  const [dr, di] = rings(dx0, dy0, dx0 + DISC_D, dy0 + DISC_D, DISC_D / 2, 4.5);
   const discS = solid(g);
   put(discS, prism(P, front, dr, di, 0, DISC_H));
   discS.sil.classList.add("hi");
 
+  // Centre label
   const lx0 = CX - LABEL_D / 2, ly0 = CY - LABEL_D / 2;
-  const [lr, li] = rings(lx0, ly0, lx0 + LABEL_D, ly0 + LABEL_D, LABEL_D / 2, 1.5);
+  const [lr, li] = rings(lx0, ly0, lx0 + LABEL_D, ly0 + LABEL_D, LABEL_D / 2, 1.6);
   put(solid(g), prism(P, front, lr, li, DISC_H, DISC_H + LABEL_H));
 
+  // Musical notes
   const notes = NOTE_POS.map(np => {
     const headS = solid(g), stemS = solid(g);
     drawNote(P, front, np, 0, headS, stemS);

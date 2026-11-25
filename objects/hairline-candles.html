@@ -881,19 +881,18 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const BASE_W = 54, BASE_D = 54, PB = 6;
-const CX = BASE_W / 2, CY = BASE_D / 2;
-const PLATE_D = 42, PLATE_H = 2;
-const CAKE_D = 28, CAKE_H = 14;
-const CANDLE_W = 2.5, CANDLE_D = 2.5, CANDLE_H = 10;
-const FLAME_W = 2.2, FLAME_D = 2.2, FLAME_H = 5;
-const N = 5;
-const CANDLE_R = 8;
-const SWAY = 4;
+// Cake fills canvas — fit tightly around the circular plate
+const PLATE_D = 46, PLATE_H = 2.5;
+const CAKE_D = 34, CAKE_H = 18;
+const CANDLE_W = 3, CANDLE_D = 3, CANDLE_H = 11;
+const FLAME_W = 2.5, FLAME_D = 2.5, FLAME_H = 6;
+const N = 5, CANDLE_R = 10;
+const SWAY = 5, PB = 3;
+const CX = PLATE_D / 2 + PB, CY = PLATE_D / 2 + PB;
 
-function drawFlame(P, front, cx, cy, ox, oy, flameS) {
-  const fx0 = cx - FLAME_W / 2 + ox, fy0 = cy - FLAME_D / 2 + oy;
-  const [fr, fi] = rings(fx0, fy0, fx0 + FLAME_W, fy0 + FLAME_D, FLAME_W / 2 * 0.9, 0.6);
+function drawFlame(P, front, cx, cy, ox, flameS) {
+  const fx0 = cx - FLAME_W / 2 + ox, fy0 = cy - FLAME_D / 2;
+  const [fr, fi] = rings(fx0, fy0, fx0 + FLAME_W, fy0 + FLAME_D, FLAME_W / 2 * 0.9, 0.7);
   const baseZ = PLATE_H + CAKE_H + CANDLE_H;
   put(flameS, prism(P, front, fr, fi, baseZ, baseZ + FLAME_H));
   flameS.sil.classList.add("hi");
@@ -902,14 +901,12 @@ function drawFlame(P, front, cx, cy, ox, oy, flameS) {
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
   const C = Cam(45, 0.5, 1.80);
-  const totalH = PLATE_H + CAKE_H + CANDLE_H + FLAME_H + SWAY + 2;
+  const totalH = PLATE_H + CAKE_H + CANDLE_H + FLAME_H + SWAY + 1;
   fit(C, [
-    [0, 0, -PB],
-    [BASE_W, BASE_D, -PB],
-    [BASE_W, 0, -PB],
-    [0, BASE_D, -PB],
-    [0, 0, totalH],
-    [BASE_W, BASE_D, totalH],
+    [CX - PLATE_D / 2 - PB, CY - PLATE_D / 2 - PB, -PB],
+    [CX + PLATE_D / 2 + PB, CY + PLATE_D / 2 + PB, -PB],
+    [CX - PLATE_D / 2, CY - PLATE_D / 2, totalH],
+    [CX + PLATE_D / 2, CY + PLATE_D / 2, totalH],
   ], 200, 162);
   const P = proj(C), front = facing(C);
   let over = false;
@@ -917,29 +914,29 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 1.5);
-  put(solid(g), prism(P, front, pr, pi, -PB, 0));
-
+  // Round plate (saucer) — the base
   const px0 = CX - PLATE_D / 2, py0 = CY - PLATE_D / 2;
-  const [plr, pli] = rings(px0, py0, px0 + PLATE_D, py0 + PLATE_D, PLATE_D / 2, 3.5);
+  const [plr, pli] = rings(px0, py0, px0 + PLATE_D, py0 + PLATE_D, PLATE_D / 2, 4.0);
   const plateS = solid(g);
   put(plateS, prism(P, front, plr, pli, 0, PLATE_H));
   plateS.sil.classList.add("hi");
 
+  // Cake — large cylinder
   const ckx0 = CX - CAKE_D / 2, cky0 = CY - CAKE_D / 2;
-  const [cr, ci] = rings(ckx0, cky0, ckx0 + CAKE_D, cky0 + CAKE_D, CAKE_D / 2, 3.0);
+  const [cr, ci] = rings(ckx0, cky0, ckx0 + CAKE_D, cky0 + CAKE_D, CAKE_D / 2, 3.5);
   put(solid(g), prism(P, front, cr, ci, PLATE_H, PLATE_H + CAKE_H));
 
+  // 5 candles arranged in a circle
   const candles = [];
   for (let i = 0; i < N; i++) {
     const a = (i / N) * Math.PI * 2 - Math.PI / 2;
     const ccx = CX + Math.cos(a) * CANDLE_R;
     const ccy = CY + Math.sin(a) * CANDLE_R;
     const cx0c = ccx - CANDLE_W / 2, cy0c = ccy - CANDLE_D / 2;
-    const [kr, ki] = rings(cx0c, cy0c, cx0c + CANDLE_W, cy0c + CANDLE_D, 0.5, 0.4);
+    const [kr, ki] = rings(cx0c, cy0c, cx0c + CANDLE_W, cy0c + CANDLE_D, 0.7, 0.5);
     put(solid(g), prism(P, front, kr, ki, PLATE_H + CAKE_H, PLATE_H + CAKE_H + CANDLE_H));
     const flameS = solid(g);
-    drawFlame(P, front, ccx, ccy, 0, 0, flameS);
+    drawFlame(P, front, ccx, ccy, 0, flameS);
     candles.push({
       cx: ccx, cy: ccy, flameS,
       sp: spring(0, { k: 55, c: 10, eps: 0.05 }),
@@ -955,7 +952,7 @@ function mount({ stage, svg, read }, value) {
       const ox = c.sp.x;
       if (Math.abs(ox - c.drawn) < 0.02) continue;
       c.drawn = ox;
-      drawFlame(P, front, c.cx, c.cy, ox, 0, c.flameS);
+      drawFlame(P, front, c.cx, c.cy, ox, c.flameS);
     }
     return m;
   });
