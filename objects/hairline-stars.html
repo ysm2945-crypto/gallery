@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,7 +6,7 @@
 <title>Hairline figure</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { color-scheme: light; --ground: #ffffff; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
+  :root { color-scheme: light; --ground: #fff8f4; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { color-scheme: dark; --ground: #08090a; --ink: #d0d6e0; --muted: #8a8c95; --line: #29292d; }
   }
@@ -876,116 +876,130 @@ var HL = (() => {
 })();
 </script>
 <script type="module" id="hl-figure">
-/**
- * Stars: fifteen small lights floating above a dark base. The pointer is
- * projected onto the base, and nearby lights scatter away on paired springs —
- * like sparks startled by a hand. When the pointer leaves, they drift back.
- * The slider is the scatter reach.
- *
- * The pattern: scattered discrete items. Paired springs (x, y offset),
- * direction from pointer to star, hit test on the base at z = 0.
- */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
-  mk, place, pointer, put, register, disposer, solid,
+  mk, pointer, put, register, disposer, solid,
 } = HL;
 
-// [x, y, z, r] — world position and dot radius
-const STARS_DATA = [
-  [10, 9,  12, 2.2], [32, 7,  16, 1.6], [56, 11, 9,  2.0],
-  [6,  24, 7,  1.4], [24, 21, 18, 2.6], [44, 17, 13, 1.8], [63, 23, 8,  1.5],
-  [17, 37, 11, 2.0], [40, 34, 20, 2.8], [58, 37, 10, 1.4],
-  [29, 45, 8,  1.6], [50, 41, 14, 2.2],
-  [4,  42, 6,  1.2], [66, 45, 7,  1.8], [36, 14, 22, 2.4],
+const BASE_W = 58, BASE_D = 44, PB = 5;
+const CX = BASE_W / 2, CY = BASE_D / 2;
+const BOX_W = 46, BOX_D = 32, BOX_H = 12;
+const LID_W = 50, LID_D = 36, LID_H = 4;
+const STAR_Z = BOX_H + LID_H;
+
+const STAR_POS = [
+  { rx: -13, ry: -8  },
+  { rx:  7,  ry: -10 },
+  { rx: -4,  ry:  2  },
+  { rx: 14,  ry:  5  },
+  { rx: -9,  ry:  10 },
 ];
-const BASE_W = 72, BASE_D = 52, PB = 5;
-const SCATTER = 16;
+const N_STARS = STAR_POS.length;
+
+function setStarLit(s, lit) {
+  if (s.lit === lit) return false;
+  s.lit = lit;
+  if (lit) {
+    s.hBar.sil.classList.add("hi");
+    s.dBar.sil.classList.add("hi");
+    s.center.sil.classList.add("hi");
+  } else {
+    s.hBar.sil.classList.remove("hi");
+    s.dBar.sil.classList.remove("hi");
+    s.center.sil.classList.remove("hi");
+  }
+  return true;
+}
+
+function buildStar(P, front, g, sp) {
+  const sx = CX + sp.rx, sy = CY + sp.ry;
+
+  const hBar = solid(g);
+  const [hr, hi] = rings(sx - 2.5, sy - 0.6, sx + 2.5, sy + 0.6, 0.5, 0.4);
+  put(hBar, prism(P, front, hr, hi, STAR_Z, STAR_Z + 1.5));
+
+  const dBar = solid(g);
+  const [dr, di] = rings(sx - 0.6, sy - 2.5, sx + 0.6, sy + 2.5, 0.5, 0.4);
+  put(dBar, prism(P, front, dr, di, STAR_Z, STAR_Z + 1.5));
+
+  const center = solid(g);
+  const [cr, ci] = rings(sx - 1.4, sy - 1.4, sx + 1.4, sy + 1.4, 1.3, 1.0);
+  put(center, prism(P, front, cr, ci, STAR_Z, STAR_Z + 2));
+
+  return { hBar, dBar, center, lit: false };
+}
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  const C = Cam(45, 0.5, 1.56);
+  const C = Cam(45, 0.5, 1.72);
   fit(C, [
-    [-PB, -PB, -PB],
-    [BASE_W + SCATTER + PB, BASE_D + SCATTER + PB, -PB],
-    [BASE_W + SCATTER + PB, -PB, -PB],
-    [-PB, BASE_D + SCATTER + PB, -PB],
-    [0, 0, 24],
-    [BASE_W + SCATTER, BASE_D + SCATTER, 24],
+    [0, 0, -PB],
+    [BASE_W, BASE_D, -PB],
+    [BASE_W, 0, -PB],
+    [0, BASE_D, -PB],
+    [0, 0, STAR_Z + 4],
+    [BASE_W, BASE_D, STAR_Z + 4],
   ], 200, 162);
   const P = proj(C), front = facing(C);
-  let R = value * 12, over = null;
+  let hoverPhase = 0, entering = false;
+  read.textContent = "orgelbox";
 
   const g = mk("g", {}, svg);
 
-  // Dark base
-  const [br, bi] = rings(-PB, -PB, BASE_W + PB, BASE_D + PB, 7, 2.0);
-  put(solid(g), prism(P, front, br, bi, -PB, 0));
+  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 1.5);
+  put(solid(g), prism(P, front, pr, pi, -PB, 0));
 
-  // Stars: circles positioned at world coordinates
-  const stars = STARS_DATA.map(([x, y, z, r]) => {
-    const el = mk("circle", { r, class: "dot m" }, g);
-    place(el, P(x, y, z));
-    return {
-      x, y, z, r,
-      spx: spring(0, { k: 90, c: 16, eps: 0.08 }),
-      spy: spring(0, { k: 90, c: 16, eps: 0.08 }),
-      el, drawn_x: 0, drawn_y: 0,
-    };
-  });
+  const bx0 = CX - BOX_W / 2, by0 = CY - BOX_D / 2;
+  const [br, bi] = rings(bx0, by0, bx0 + BOX_W, by0 + BOX_D, 4, 1.8);
+  put(solid(g), prism(P, front, br, bi, 0, BOX_H));
 
-  let nearest = null;
+  const lx0 = CX - LID_W / 2, ly0 = CY - LID_D / 2;
+  const [lr, li] = rings(lx0, ly0, lx0 + LID_W, ly0 + LID_D, 4, 1.8);
+  const lidS = solid(g);
+  put(lidS, prism(P, front, lr, li, BOX_H, BOX_H + LID_H));
+  lidS.sil.classList.add("hi");
+
+  const stars = STAR_POS.map(sp => buildStar(P, front, g, sp));
 
   const B = register(stage, (dt) => {
-    let m = false;
-    for (const s of stars) {
-      const mx = stepS(s.spx, dt), my = stepS(s.spy, dt);
-      if (!mx && !my) continue;
-      m = true;
-      const ox = s.spx.x, oy = s.spy.x;
-      if (Math.abs(ox - s.drawn_x) < 0.03 && Math.abs(oy - s.drawn_y) < 0.03) continue;
-      s.drawn_x = ox; s.drawn_y = oy;
-      place(s.el, P(s.x + ox, s.y + oy, s.z));
+    if (entering) hoverPhase = Math.min(hoverPhase + dt * 2.5, N_STARS);
+    else hoverPhase = Math.max(hoverPhase - dt * 3.5, 0);
+
+    let changed = false;
+    for (let i = 0; i < N_STARS; i++) {
+      const lit = hoverPhase > i + 0.3;
+      if (setStarLit(stars[i], lit)) changed = true;
     }
-    return m;
+
+    const nLit = stars.filter(s => s.lit).length;
+    read.textContent = nLit === 0 ? "orgelbox" : nLit === N_STARS ? "all lit" : `${nLit} stars`;
+
+    return changed || entering || hoverPhase > 0;
   });
   bag.add(B.unregister);
 
-  function retarget() {
-    let nearStar = null, nearD = Infinity;
-    for (const s of stars) {
-      if (!over) { s.spx.t = 0; s.spy.t = 0; s.el.setAttribute("class", "dot m"); continue; }
-      const dx = s.x - over[0], dy = s.y - over[1];
-      const d = Math.hypot(dx, dy);
-      const factor = SCATTER * clamp(1 - d / R, 0, 1) ** 1.3;
-      if (d < 0.5) { s.spx.t = factor; s.spy.t = 0; }
-      else { s.spx.t = (dx / d) * factor; s.spy.t = (dy / d) * factor; }
-      if (d < nearD) { nearD = d; nearStar = s; }
-    }
-    if (nearest && nearest !== nearStar) nearest.el.setAttribute("class", "dot m");
-    nearest = nearStar;
-    if (nearest) nearest.el.setAttribute("class", "hi nf");
-    read.textContent = nearest ? "scattered" : "quiet";
-    B.wake();
-  }
-
   bag.add(pointer(stage, {
-    move: (p) => { over = unproj(C, p[0], p[1], 0); retarget(); },
-    leave: () => { over = null; retarget(); },
+    move: () => {
+      if (!entering) { entering = true; B.wake(); }
+    },
+    leave: () => {
+      if (entering) { entering = false; B.wake(); }
+    },
   }));
   bag.add(() => svg.replaceChildren());
 
   return {
-    set: (v) => { R = v * 12; if (over) retarget(); },
+    set: (_v) => {},
     destroy: bag.dispose,
   };
 }
 
 hairline({
   name: "stars",
-  means: "Fifteen lights scatter away from the pointer and drift back when it leaves.",
-  rules: [1, 2, 3, 5, 7, 8],
-  range: [2, 4, 6],
-  tour: [[160, 160], [240, 120], [180, 210], null],
+  means: "A music box with star ornaments — hover to light them up one by one.",
+  rules: [1, 4, 5, 7, 8, 9],
+  range: [4, 7, 10],
+  tour: [[190, 110], [200, 162], [210, 190], null],
   mount,
 });
 </script>
@@ -1015,3 +1029,4 @@ hairline({
 </script>
 </body>
 </html>
+

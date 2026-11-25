@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,7 +6,7 @@
 <title>Hairline figure</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { color-scheme: light; --ground: #ffffff; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
+  :root { color-scheme: light; --ground: #fff8f4; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { color-scheme: dark; --ground: #08090a; --ink: #d0d6e0; --muted: #8a8c95; --line: #29292d; }
   }
@@ -876,28 +876,20 @@ var HL = (() => {
 })();
 </script>
 <script type="module" id="hl-figure">
-/**
- * Curtain & Window: eight fabric folds hang from a rail set inside a simple
- * window frame — two side pillars and a top lintel. The pointer is projected
- * onto the rail top, and nearby folds drift sideways on springs — like soft
- * cloth caught by a hand. When the pointer leaves, folds settle back.
- * The slider is the reach radius, in cells.
- */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const N = 8, STEP = 10, FW = 7, FD = 7, PB = 4;
-const HEIGHTS = [26, 32, 28, 34, 29, 33, 27, 31];
+const N = 10, STEP = 8, FW = 5.5, FD = 7, PB = 4;
+const HEIGHTS = [30, 36, 32, 38, 34, 36, 31, 35, 33, 37];
 const RAIL_H = 3, RAIL_D = FD + 2;
 const BASE_W = N * STEP + 2;
-const SWAY = 14;
-// Window frame geometry
-const PIL_W = 5, PIL_D = RAIL_D + 4;   // side pillars width/depth
-const LIN_H = 5;                        // lintel (top bar) height
-const WIN_X = -PIL_W, WIN_Y = -2;       // frame starts left of curtain area
-const WIN_W = BASE_W + PIL_W * 2;       // total window width
+const SWAY_Y = 10;
+const PIL_W = 5, PIL_D = RAIL_D + 4;
+const LIN_H = 5;
+const WIN_X = -PIL_W, WIN_Y = -2;
+const WIN_W = BASE_W + PIL_W * 2;
 const FRAME_TOP = Math.max(...HEIGHTS) + RAIL_H + LIN_H;
 
 function mount({ stage, svg, read }, value) {
@@ -906,33 +898,30 @@ function mount({ stage, svg, read }, value) {
   const C = Cam(45, 0.5, 1.56);
   fit(C, [
     [WIN_X - PB, WIN_Y - PB, -PB],
-    [WIN_X + WIN_W + SWAY + PB, PIL_D + PB, -PB],
-    [WIN_X + WIN_W + SWAY + PB, WIN_Y - PB, -PB],
-    [WIN_X - PB, PIL_D + PB, -PB],
+    [WIN_X + WIN_W + PB, PIL_D + SWAY_Y + PB, -PB],
+    [WIN_X + WIN_W + PB, WIN_Y - PB, -PB],
+    [WIN_X - PB, PIL_D + SWAY_Y + PB, -PB],
     [0, 0, FRAME_TOP],
-    [BASE_W + SWAY, 0, FRAME_TOP],
-    [0, PIL_D, FRAME_TOP],
-    [BASE_W + SWAY, PIL_D, FRAME_TOP],
+    [BASE_W, 0, FRAME_TOP],
+    [0, PIL_D + SWAY_Y, FRAME_TOP],
+    [BASE_W, PIL_D + SWAY_Y, FRAME_TOP],
   ], 200, 162);
   const P = proj(C), front = facing(C);
-  let R = value * STEP, over = null;
+  let t = 0, over = false;
+  read.textContent = "still";
 
   const g = mk("g", {}, svg);
 
-  // Left pillar
   const [lpr, lpi] = rings(WIN_X, WIN_Y, WIN_X + PIL_W, WIN_Y + PIL_D, 2.0, 1.4);
   put(solid(g), prism(P, front, lpr, lpi, -PB, FRAME_TOP - LIN_H));
 
-  // Right pillar
   const RPX = BASE_W;
   const [rpr, rpi] = rings(RPX, WIN_Y, RPX + PIL_W, WIN_Y + PIL_D, 2.0, 1.4);
   put(solid(g), prism(P, front, rpr, rpi, -PB, FRAME_TOP - LIN_H));
 
-  // Curtain rail (fixed, sits inside window)
   const [rr, ri] = rings(-PB, -PB, BASE_W + PB, RAIL_D + PB, 4, 1.2);
   put(solid(g), prism(P, front, rr, ri, -PB, RAIL_H));
 
-  // Folds: tall narrow prisms
   const folds = [];
   for (let i = 0; i < N; i++) {
     const x0 = i * STEP + (STEP - FW) / 2;
@@ -941,61 +930,61 @@ function mount({ stage, svg, read }, value) {
     const [fr, fi] = rings(x0, y0, x0 + FW, y0 + FD, 2.0, 0.8);
     const sw = solid(g);
     put(sw, prism(P, front, fr, fi, RAIL_H, RAIL_H + h));
-    folds.push({ i, x0, y0, h, sp: spring(0, { k: 50, c: 12, eps: 0.08 }), sw, drawn: 0 });
+    folds.push({ i, x0, y0, h, sp: spring(0, { k: 45, c: 11, eps: 0.08 }), sw, drawn: 0 });
   }
 
-  // Top lintel (painted after folds so it sits on top)
-  const linY = WIN_Y;
-  const [lnr, lni] = rings(WIN_X, linY, WIN_X + WIN_W, linY + PIL_D, 2.0, 1.6);
   const lintelS = solid(g);
+  const [lnr, lni] = rings(WIN_X, WIN_Y, WIN_X + WIN_W, WIN_Y + PIL_D, 2.0, 1.6);
   put(lintelS, prism(P, front, lnr, lni, FRAME_TOP - LIN_H, FRAME_TOP));
   lintelS.sil.classList.add("hi");
 
   const B = register(stage, (dt) => {
     let m = false;
+    if (over) {
+      t += dt;
+      for (const c of folds) {
+        c.sp.t = SWAY_Y * Math.sin(t * 2.2 + c.i * 0.55);
+      }
+    }
     for (const c of folds) {
       if (!stepS(c.sp, dt)) continue;
       m = true;
-      const ox = c.sp.x;
-      if (ox === c.drawn) continue;
-      c.drawn = ox;
-      const x0 = c.x0 + ox, y0 = c.y0;
+      const oy = c.sp.x;
+      if (Math.abs(oy - c.drawn) < 0.03) continue;
+      c.drawn = oy;
+      const x0 = c.x0, y0 = c.y0 + oy;
       const [fr, fi] = rings(x0, y0, x0 + FW, y0 + FD, 2.0, 0.8);
       put(c.sw, prism(P, front, fr, fi, RAIL_H, RAIL_H + c.h));
-      c.sw.sil.classList.toggle("hi", ox > SWAY * 0.5);
+      c.sw.sil.classList.toggle("hi", oy > SWAY_Y * 0.4 || oy < -SWAY_Y * 0.4);
     }
-    return m;
+    return m || over;
   });
   bag.add(B.unregister);
 
-  function retarget() {
-    let nearest = null, nearestD = Infinity;
-    for (const c of folds) {
-      if (!over) { c.sp.t = 0; continue; }
-      const cx = c.x0 + FW / 2, cy = c.y0 + FD / 2;
-      const d = Math.hypot(cx - over[0], cy - over[1]);
-      if (d < nearestD) { nearestD = d; nearest = c; }
-      c.sp.t = SWAY * clamp(1 - d / R, 0, 1) ** 1.5;
-    }
-    read.textContent = nearest ? `fold ${nearest.i + 1}` : "still";
-    B.wake();
-  }
-
   bag.add(pointer(stage, {
-    move: (p) => { over = unproj(C, p[0], p[1], RAIL_H); retarget(); },
-    leave: () => { over = null; retarget(); },
+    move: () => {
+      if (!over) { over = true; read.textContent = "wind"; B.wake(); }
+    },
+    leave: () => {
+      if (over) {
+        over = false;
+        for (const c of folds) c.sp.t = 0;
+        read.textContent = "still";
+        B.wake();
+      }
+    },
   }));
   bag.add(() => svg.replaceChildren());
 
   return {
-    set: (v) => { R = v * STEP; if (over) retarget(); },
+    set: (_v) => {},
     destroy: bag.dispose,
   };
 }
 
 hairline({
   name: "curtain",
-  means: "Curtain folds hang inside a window frame and drift when the pointer sweeps past.",
+  means: "Chiffon curtain folds sway front and back in a wave when the wind comes through.",
   rules: [1, 2, 3, 5, 8, 9],
   range: [2, 3.5, 5],
   tour: [[120, 165], [220, 125], [310, 155], null],
@@ -1028,3 +1017,4 @@ hairline({
 </script>
 </body>
 </html>
+

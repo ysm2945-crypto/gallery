@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,7 +6,7 @@
 <title>Hairline figure</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { color-scheme: light; --ground: #ffffff; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
+  :root { color-scheme: light; --ground: #fff8f4; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { color-scheme: dark; --ground: #08090a; --ink: #d0d6e0; --muted: #8a8c95; --line: #29292d; }
   }
@@ -876,122 +876,102 @@ var HL = (() => {
 })();
 </script>
 <script type="module" id="hl-figure">
-/**
- * Moon & Book: an open book lies on a base plate; a round moon disc rises
- * above it when the pointer rests inside the circle. When the pointer
- * leaves, the moon settles back down to a crescent. The slider is the
- * resting height.
- *
- * The pattern: one spring drives the moon height; hit test on the circular
- * footprint at z = 0 (which never moves).
- */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const PLATE_W = 48, PLATE_D = 36, PB = 5;
-const H_FULL = 26;
-// book dimensions
-const BK_W = 36, BK_D = 26, BK_H = 2.5;      // overall open book footprint
-const PAGE_W = 16, PAGE_D = BK_D, PAGE_H = BK_H; // each page half
-const SPINE_W = 4, SPINE_D = BK_D;             // spine strip in between
-const BK_X = (PLATE_W - BK_W) / 2;
-const BK_Y = (PLATE_D - BK_D) / 2;
-// moon sits centred above the book
-const CX = PLATE_W / 2, CY = PLATE_D / 2;
-const MOON_D = 20;
+const BASE_W = 54, BASE_D = 54, PB = 6;
+const CX = BASE_W / 2, CY = BASE_D / 2;
+const MOON_D = 42, MOON_H = 6;
+const LIQ_MAX = 14;
+
+const CRATERS = [
+  { rx: -10, ry: -6,  d: 7 },
+  { rx:  8,  ry:  7,  d: 5 },
+  { rx: -5,  ry: 10,  d: 6 },
+  { rx:  7,  ry: -10, d: 4 },
+  { rx: -1,  ry:  1,  d: 9 },
+];
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  const C = Cam(45, 0.5, 1.88);
+  const C = Cam(45, 0.5, 1.84);
   fit(C, [
     [0, 0, -PB],
-    [PLATE_W, PLATE_D, -PB],
-    [PLATE_W, 0, -PB],
-    [0, PLATE_D, -PB],
-    [0, 0, H_FULL + BK_H],
-    [PLATE_W, PLATE_D, H_FULL + BK_H],
+    [BASE_W, BASE_D, -PB],
+    [BASE_W, 0, -PB],
+    [0, BASE_D, -PB],
+    [0, 0, MOON_H + LIQ_MAX + 2],
+    [BASE_W, BASE_D, MOON_H + LIQ_MAX + 2],
   ], 200, 162);
   const P = proj(C), front = facing(C);
-
-  const hRest = clamp(value, 1, H_FULL * 0.4);
-  const sp = spring(hRest, { k: 32, c: 10, eps: 0.05 });
+  const sp = spring(0, { k: 22, c: 7, eps: 0.04 });
   let over = false;
-  read.textContent = "still";
+  read.textContent = "moon";
 
   const g = mk("g", {}, svg);
 
-  // Base plate
-  const [pr, pi] = rings(0, 0, PLATE_W, PLATE_D, 7, 2.0);
+  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 1.5);
   put(solid(g), prism(P, front, pr, pi, -PB, 0));
 
-  // Open book — left page
-  const lpx0 = BK_X, lpy0 = BK_Y;
-  const [lpr, lpi] = rings(lpx0, lpy0, lpx0 + PAGE_W, lpy0 + PAGE_D, 2.0, 1.0);
-  put(solid(g), prism(P, front, lpr, lpi, 0, PAGE_H));
+  const mx0 = CX - MOON_D / 2, my0 = CY - MOON_D / 2;
+  const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 4.0);
+  const moonS = solid(g);
+  put(moonS, prism(P, front, mr, mi, 0, MOON_H));
+  moonS.sil.classList.add("hi");
 
-  // Open book — spine
-  const spx0 = BK_X + PAGE_W, spy0 = BK_Y;
-  const [spr2, spi2] = rings(spx0, spy0, spx0 + SPINE_W, spy0 + SPINE_D, 1.0, 1.4);
-  const spineS = solid(g);
-  put(spineS, prism(P, front, spr2, spi2, 0, PAGE_H + 1));
-  spineS.sil.classList.add("hi");
-
-  // Open book — right page
-  const rpx0 = BK_X + PAGE_W + SPINE_W, rpy0 = BK_Y;
-  const [rpr, rpi] = rings(rpx0, rpy0, rpx0 + PAGE_W, rpy0 + PAGE_D, 2.0, 1.0);
-  put(solid(g), prism(P, front, rpr, rpi, 0, PAGE_H));
-
-  // Moon disc (animated height)
-  const moon = solid(g);
-  function drawMoon(h) {
-    const mx0 = CX - MOON_D / 2, my0 = CY - MOON_D / 2;
-    const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 4.0);
-    put(moon, prism(P, front, mr, mi, BK_H, BK_H + h));
-    moon.sil.classList.toggle("hi", h > H_FULL * 0.65);
+  for (const c of CRATERS) {
+    const cx0 = CX + c.rx - c.d / 2, cy0 = CY + c.ry - c.d / 2;
+    const [cr, ci] = rings(cx0, cy0, cx0 + c.d, cy0 + c.d, c.d / 2 * 0.9, 1.4);
+    put(solid(g), prism(P, front, cr, ci, MOON_H, MOON_H + 2));
   }
-  drawMoon(hRest);
-  let drawn = hRest;
+
+  const liqD = MOON_D - 6;
+  const lx0 = CX - liqD / 2, ly0 = CY - liqD / 2;
+  const liqS = solid(g);
+  function drawLiq(h) {
+    if (h < 0.1) { put(liqS, prism(P, front, [], [], 0, 0)); return; }
+    const [lr, li] = rings(lx0, ly0, lx0 + liqD, ly0 + liqD, liqD / 2, 3.5);
+    put(liqS, prism(P, front, lr, li, 0, h));
+    liqS.sil.classList.toggle("hi", h > LIQ_MAX * 0.6);
+  }
+  drawLiq(0);
+  let drawn = 0;
 
   const B = register(stage, (dt) => {
     if (!stepS(sp, dt)) return false;
     const h = sp.x;
-    if (Math.abs(h - drawn) < 0.05) return false;
+    if (Math.abs(h - drawn) < 0.04) return false;
     drawn = h;
-    drawMoon(h);
-    read.textContent = h > H_FULL * 0.8 ? "full" : h > H_FULL * 0.4 ? "waxing" : "crescent";
+    drawLiq(h);
+    read.textContent = h > LIQ_MAX * 0.75 ? "rising" : h > 0.1 ? "filling" : "moon";
     return true;
   });
   bag.add(B.unregister);
 
   bag.add(pointer(stage, {
     move: () => {
-      if (!over) { over = true; sp.t = H_FULL; }
-      B.wake();
+      if (!over) { over = true; sp.t = LIQ_MAX; B.wake(); }
     },
     leave: () => {
-      if (over) { over = false; sp.t = hRest; }
-      B.wake();
+      if (over) { over = false; sp.t = 0; B.wake(); }
     },
   }));
   bag.add(() => svg.replaceChildren());
 
   return {
-    set: (v) => {
-      const newRest = clamp(v, 1, H_FULL * 0.4);
-      if (!over) { sp.t = newRest; B.wake(); }
-    },
+    set: (_v) => {},
     destroy: bag.dispose,
   };
 }
 
 hairline({
   name: "moon",
-  means: "A moon rises above an open book when the pointer rests on it, then settles back.",
-  rules: [1, 4, 5, 8, 9],
-  range: [1, 4, 9],
-  tour: [[260, 135], [200, 162], [185, 175], null],
+  means: "A full moon with craters — hover to watch liquid rise inside it.",
+  rules: [1, 4, 5, 7, 8, 9],
+  range: [3, 7, 14],
+  tour: [[200, 100], [200, 162], [190, 200], null],
   mount,
 });
 </script>
@@ -1021,3 +1001,4 @@ hairline({
 </script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6,7 +6,7 @@
 <title>Hairline figure</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { color-scheme: light; --ground: #ffffff; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
+  :root { color-scheme: light; --ground: #fff8f4; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { color-scheme: dark; --ground: #08090a; --ink: #d0d6e0; --muted: #8a8c95; --line: #29292d; }
   }
@@ -876,114 +876,118 @@ var HL = (() => {
 })();
 </script>
 <script type="module" id="hl-figure">
-/**
- * Record: a vinyl disc with a raised centre label. While the pointer rests on
- * the disc, it spins up on a spring — slow at first, then steady. When the
- * pointer leaves, it coasts to a stop. A groove marker traces the orbit.
- * The slider is the spin speed.
- *
- * The pattern: one spring drives angular speed; angle integrates in the loop.
- * Hit test on the disc footprint at z = 0 (which never moves).
- */
 const {
   Cam, clamp, facing, fit, prism, proj, rings, unproj, spring, stepS,
-  flatDot, mk, place, pointer, put, register, disposer, solid,
+  mk, pointer, put, register, disposer, solid,
 } = HL;
 
-const D = 32, D_LBL = 11, H_DISC = 3, H_LBL = 5, PB = 6;
-const BASE_W = D + PB * 2, BASE_D = D + PB * 2;
+const BASE_W = 58, BASE_D = 58, PB = 7;
 const CX = BASE_W / 2, CY = BASE_D / 2;
-const R_GROOVE = D / 2 * 0.73;
+const DISC_D = 46, DISC_H = 3;
+const LABEL_D = 12, LABEL_H = 2;
+const NOTE_JUMP = 12;
+const PERIOD = 0.28;
+
+const NOTE_POS = [
+  { rx: -14, ry: -8,  hw: 4, hd: 3.5, sh: 9  },
+  { rx:  2,  ry: -16, hw: 3.5, hd: 3, sh: 8  },
+  { rx:  13, ry:  -4, hw: 4,  hd: 4,  sh: 11 },
+  { rx:  10, ry:  12, hw: 3.5, hd: 3, sh: 7  },
+  { rx: -5,  ry:  14, hw: 4,  hd: 3.5, sh: 10 },
+  { rx: -15, ry:  6,  hw: 3,  hd: 3,  sh: 8  },
+];
+const N_NOTES = NOTE_POS.length;
+
+function drawNote(P, front, np, oz, headS, stemS) {
+  const baseZ = DISC_H + LABEL_H;
+  const hcx = CX + np.rx, hcy = CY + np.ry;
+  const hx0 = hcx - np.hw / 2, hy0 = hcy - np.hd / 2;
+  const [hr, hi] = rings(hx0, hy0, hx0 + np.hw, hy0 + np.hd, np.hw / 2 * 0.88, 1.2);
+  put(headS, prism(P, front, hr, hi, baseZ + oz, baseZ + oz + 2.5));
+  headS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
+
+  const sx0 = hcx - 0.7, sy0 = hcy - 0.7;
+  const [sr, si] = rings(sx0, sy0, sx0 + 1.4, sy0 + 1.4, 0.4, 0.4);
+  put(stemS, prism(P, front, sr, si, baseZ + oz + 2.5, baseZ + oz + 2.5 + np.sh));
+  stemS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
+}
 
 function mount({ stage, svg, read }, value) {
   const bag = disposer();
-  const C = Cam(45, 0.5, 1.90);
+  const C = Cam(45, 0.5, 1.80);
   fit(C, [
     [0, 0, -PB],
     [BASE_W, BASE_D, -PB],
     [BASE_W, 0, -PB],
     [0, BASE_D, -PB],
-    [0, 0, H_LBL],
-    [BASE_W, BASE_D, H_LBL],
-  ], 200, 160);
+    [0, 0, DISC_H + LABEL_H + NOTE_JUMP + 14],
+    [BASE_W, BASE_D, DISC_H + LABEL_H + NOTE_JUMP + 14],
+  ], 200, 162);
   const P = proj(C), front = facing(C);
-
-  const maxSpeed = value; // rotations per second
-  const speedSp = spring(0, { k: 1.5, c: 2.5, eps: 0.01 });
-  let angle = 0, over = false;
-  read.textContent = "still";
+  let hoverTime = 0, over = false;
+  read.textContent = "record";
 
   const g = mk("g", {}, svg);
 
-  // Base plate
-  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 2.0);
+  const [pr, pi] = rings(0, 0, BASE_W, BASE_D, PB, 1.5);
   put(solid(g), prism(P, front, pr, pi, -PB, 0));
 
-  // Outer disc
-  const disc = solid(g);
-  const [dr, di] = rings(PB, PB, PB + D, PB + D, D / 2, 3.5);
-  put(disc, prism(P, front, dr, di, 0, H_DISC));
+  const dx0 = CX - DISC_D / 2, dy0 = CY - DISC_D / 2;
+  const [dr, di] = rings(dx0, dy0, dx0 + DISC_D, dy0 + DISC_D, DISC_D / 2, 4.0);
+  const discS = solid(g);
+  put(discS, prism(P, front, dr, di, 0, DISC_H));
+  discS.sil.classList.add("hi");
 
-  // Centre label (smaller raised circle)
-  const label = solid(g);
-  const lx = CX - D_LBL / 2, ly = CY - D_LBL / 2;
-  const [lr, li] = rings(lx, ly, lx + D_LBL, ly + D_LBL, D_LBL / 2, 1.6);
-  put(label, prism(P, front, lr, li, H_DISC, H_LBL));
-  label.sil.classList.add("hi");
+  const lx0 = CX - LABEL_D / 2, ly0 = CY - LABEL_D / 2;
+  const [lr, li] = rings(lx0, ly0, lx0 + LABEL_D, ly0 + LABEL_D, LABEL_D / 2, 1.5);
+  put(solid(g), prism(P, front, lr, li, DISC_H, DISC_H + LABEL_H));
 
-  // Tonearm: a thin rectangular prism angled from the back-right corner to the groove
-  const ARM_X0 = PB + D * 0.82, ARM_Y0 = PB + D * 0.04;
-  const ARM_X1 = PB + D * 0.82 + 2, ARM_Y1 = PB + D * 0.04 + 14;
-  const [ar, ai] = rings(ARM_X0, ARM_Y0, ARM_X1, ARM_Y1, 0.8, 0.5);
-  const armS = solid(g);
-  put(armS, prism(P, front, ar, ai, H_DISC, H_LBL + 1));
-  armS.sil.classList.add("hi");
-
-  // Tonearm pivot base (small rounded block at the top)
-  const PIV_D = 3.5;
-  const [pvr, pvi] = rings(ARM_X0 - 1, ARM_Y0 - 1, ARM_X0 + PIV_D, ARM_Y0 + PIV_D, 1.4, 0.8);
-  put(solid(g), prism(P, front, pvr, pvi, H_DISC, H_LBL + 2));
-
-  // Groove marker dot (orbits around the disc)
-  const mark = mk("g", {}, svg);
-  const dot = flatDot(mark, C, 1.3, "dot m");
-  place(dot, P(CX + R_GROOVE, CY, H_DISC));
+  const notes = NOTE_POS.map(np => {
+    const headS = solid(g), stemS = solid(g);
+    drawNote(P, front, np, 0, headS, stemS);
+    return { np, headS, stemS, sp: spring(0, { k: 80, c: 14, eps: 0.05 }), drawn: 0 };
+  });
 
   const B = register(stage, (dt) => {
-    stepS(speedSp, dt);
-    const spd = speedSp.x;
-    if (spd < 0.002) return false;
-    angle += spd * Math.PI * 2 * dt;
-    place(dot, P(CX + R_GROOVE * Math.cos(angle), CY + R_GROOVE * Math.sin(angle), H_DISC));
-    disc.sil.classList.toggle("hi", spd > maxSpeed * 0.5);
-    return true;
+    let m = false;
+    if (over) hoverTime += dt;
+    for (let i = 0; i < N_NOTES; i++) {
+      const n = notes[i];
+      const notePhase = ((hoverTime / PERIOD) - i) % N_NOTES;
+      n.sp.t = over && notePhase > 0 && notePhase < 1 ? NOTE_JUMP : 0;
+      if (!stepS(n.sp, dt)) continue;
+      m = true;
+      const oz = n.sp.x;
+      if (Math.abs(oz - n.drawn) < 0.03) continue;
+      n.drawn = oz;
+      drawNote(P, front, n.np, oz, n.headS, n.stemS);
+    }
+    return m || over;
   });
   bag.add(B.unregister);
 
   bag.add(pointer(stage, {
     move: () => {
-      if (!over) { over = true; speedSp.t = maxSpeed; read.textContent = "spinning"; }
-      B.wake();
+      if (!over) { over = true; hoverTime = 0; read.textContent = "playing"; B.wake(); }
     },
     leave: () => {
-      if (over) { over = false; speedSp.t = 0; read.textContent = "still"; }
-      B.wake();
+      if (over) { over = false; read.textContent = "record"; B.wake(); }
     },
   }));
   bag.add(() => svg.replaceChildren());
 
   return {
-    set: (v) => { if (over) speedSp.t = v; },
+    set: (_v) => {},
     destroy: bag.dispose,
   };
 }
 
 hairline({
   name: "record",
-  means: "A vinyl disc spins up while the pointer rests on it, then coasts to a stop.",
+  means: "A vinyl record with musical notes — hover to watch them jump up in sequence.",
   rules: [1, 4, 5, 7, 8, 9],
-  range: [0.6, 1.2, 2.0],
-  tour: [[260, 135], [200, 162], [190, 170], null],
+  range: [4, 7, 10],
+  tour: [[200, 100], [200, 162], [170, 185], null],
   mount,
 });
 </script>
@@ -1013,3 +1017,4 @@ hairline({
 </script>
 </body>
 </html>
+
