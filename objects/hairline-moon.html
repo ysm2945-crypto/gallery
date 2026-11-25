@@ -6,7 +6,7 @@
 <title>Hairline figure</title>
 <link rel="icon" href="data:,">
 <style>
-  :root { color-scheme: light; --ground: #fff8f4; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
+  :root { color-scheme: light; --ground: #0a1628; --ink: #232327; --muted: #6f6f78; --line: #e0e0e4; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { color-scheme: dark; --ground: #08090a; --ink: #d0d6e0; --muted: #8a8c95; --line: #29292d; }
   }
@@ -75,7 +75,7 @@
  * HL: everything a figure may call. Read this index; the code under it is the
  * package's src/core, unchanged, and a figure should not need to read it.
  *
- * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * Every figure is drawn in a 400 횞 320 viewBox. World space is x/y on the
  * ground and z up. Plates are filled with the ground colour and painted back
  * to front, so a nearer one covers a farther one: append in that order. At
  * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
@@ -840,10 +840,10 @@ var HL = (() => {
       set textContent(value) { text = value == null ? "" : String(value); $("read").textContent = text; },
     };
 
-    document.title = "Hairline · " + figure.name;
+    document.title = "Hairline 쨌 " + figure.name;
     $("name").textContent = figure.name;
     $("means").textContent = figure.means;
-    $("rules").textContent = figure.rules.map((n) => String(n).padStart(2, "0") + " " + RULES[n - 1]).join(" · ");
+    $("rules").textContent = figure.rules.map((n) => String(n).padStart(2, "0") + " " + RULES[n - 1]).join(" 쨌 ");
     const show = () => { $("value").textContent = String(at(Number(slider.value))); };
     show();
 
@@ -881,17 +881,37 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-// Moon fills the canvas — no flat base plate, just the moon disc
-const MOON_D = 50, MOON_H = 22, PB = 4;
+// Moon floating in night sky ??full moon with stars and clouds
+const MOON_D = 44, MOON_H = 36, PB = 6;
 const CX = MOON_D / 2 + PB, CY = MOON_D / 2 + PB;
-const LIQ_MAX = 20;
+const LIQ_MAX = 18;
+const SKY_W = MOON_D + PB * 2, SKY_D = MOON_D + PB * 2;
+
+// Stars scattered around the moon
+const STARS = [
+  { rx: -22, ry: -20, sz: 2.2 },
+  { rx:  25, ry: -16, sz: 1.8 },
+  { rx:  28, ry:  10, sz: 2.4 },
+  { rx: -24, ry:  18, sz: 1.6 },
+  { rx:  10, ry:  24, sz: 2.0 },
+  { rx: -18, ry:   5, sz: 1.5 },
+  { rx:  18, ry: -26, sz: 1.9 },
+  { rx: -10, ry: -24, sz: 1.7 },
+];
+
+// Clouds flanking the moon
+const CLOUDS = [
+  { rx: -34, ry: -6, cw: 18, cd: 10, ch: 5 },
+  { rx:  26, ry:  8, cw: 16, cd: 9,  ch: 4 },
+  { rx: -30, ry: 16, cw: 14, cd: 8,  ch: 4 },
+];
 
 const CRATERS = [
-  { rx: -12, ry: -7,  d: 10 },
-  { rx:  10, ry:  9,  d:  7 },
-  { rx:  -6, ry: 11,  d:  8 },
-  { rx:   8, ry: -12, d:  6 },
-  { rx:  -1, ry:  1,  d: 13 },
+  { rx: -10, ry: -6,  d: 9  },
+  { rx:   8, ry:  8,  d: 7  },
+  { rx:  -5, ry: 10,  d: 8  },
+  { rx:   6, ry: -11, d: 6  },
+  { rx:  -1, ry:  1,  d: 11 },
 ];
 
 function mount({ stage, svg, read }, value) {
@@ -900,10 +920,10 @@ function mount({ stage, svg, read }, value) {
   const liqD = MOON_D - 8;
   const lx0 = CX - liqD / 2, ly0 = CY - liqD / 2;
   fit(C, [
-    [CX - MOON_D / 2 - PB, CY - MOON_D / 2 - PB, -PB],
-    [CX + MOON_D / 2 + PB, CY + MOON_D / 2 + PB, -PB],
-    [CX - MOON_D / 2, CY - MOON_D / 2, MOON_H + LIQ_MAX + 6],
-    [CX + MOON_D / 2, CY + MOON_D / 2, MOON_H + LIQ_MAX + 6],
+    [CX - SKY_W / 2 - 10, CY - SKY_D / 2 - 10, -PB],
+    [CX + SKY_W / 2 + 10, CY + SKY_D / 2 + 10, -PB],
+    [CX - SKY_W / 2, CY - SKY_D / 2, MOON_H + LIQ_MAX + 8],
+    [CX + SKY_W / 2, CY + SKY_D / 2, MOON_H + LIQ_MAX + 8],
   ], 200, 162);
   const P = proj(C), front = facing(C);
   const sp = spring(0, { k: 22, c: 7, eps: 0.04 });
@@ -912,21 +932,42 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  // Moon disc — large, fills canvas
+  // Night sky base ??wide flat ground
+  const sx0 = CX - SKY_W / 2 - 8, sy0 = CY - SKY_D / 2 - 8;
+  const [skr, ski] = rings(sx0, sy0, sx0 + SKY_W + 16, sy0 + SKY_D + 16, 3, 1.0);
+  put(solid(g), prism(P, front, skr, ski, -PB, 0));
+
+  // Stars ??small bright prisms scattered high in the sky
+  for (const s of STARS) {
+    const sx = CX + s.rx - s.sz / 2, sy = CY + s.ry - s.sz / 2;
+    const [sr, si] = rings(sx, sy, sx + s.sz, sy + s.sz, s.sz * 0.45, 0.6);
+    const starS = solid(g);
+    put(starS, prism(P, front, sr, si, MOON_H * 0.4, MOON_H * 0.4 + s.sz * 1.2));
+    starS.sil.classList.add("hi");
+  }
+
+  // Clouds ??wide flat puffs flanking the moon
+  for (const cl of CLOUDS) {
+    const cx0 = CX + cl.rx - cl.cw / 2, cy0 = CY + cl.ry - cl.cd / 2;
+    const [cr, ci] = rings(cx0, cy0, cx0 + cl.cw, cy0 + cl.cd, cl.cd / 2 * 0.9, 2.0);
+    put(solid(g), prism(P, front, cr, ci, MOON_H * 0.1, MOON_H * 0.1 + cl.ch));
+  }
+
+  // Moon disc ??large round sphere-like, hi class
   const mx0 = CX - MOON_D / 2, my0 = CY - MOON_D / 2;
-  const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 4.5);
+  const [mr, mi] = rings(mx0, my0, mx0 + MOON_D, my0 + MOON_D, MOON_D / 2, 5.0);
   const moonS = solid(g);
   put(moonS, prism(P, front, mr, mi, 0, MOON_H));
   moonS.sil.classList.add("hi");
 
-  // Craters — prominent bumps on the moon face
+  // Craters on moon surface
   for (const c of CRATERS) {
     const cx0 = CX + c.rx - c.d / 2, cy0 = CY + c.ry - c.d / 2;
     const [cr, ci] = rings(cx0, cy0, cx0 + c.d, cy0 + c.d, c.d / 2 * 0.9, 1.6);
     put(solid(g), prism(P, front, cr, ci, MOON_H, MOON_H + 2.5));
   }
 
-  // Liquid that rises inside
+  // Liquid that rises inside the moon
   const liqS = solid(g);
   let drawn = -1;
 
@@ -967,7 +1008,7 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "moon",
-  means: "A full moon with craters — hover to watch liquid rise inside it.",
+  means: "A full moon floats in a night sky with stars and clouds ??hover to watch light rise inside it.",
   rules: [1, 4, 5, 7, 8, 9],
   range: [3, 7, 14],
   tour: [[200, 100], [200, 162], [190, 200], null],
@@ -975,7 +1016,7 @@ hairline({
 });
 </script>
 <script id="gallery-embed">
-/* 갤러리 안에 넣을 때(?embed=1)만 동작: 조작 UI를 숨기고, 누르면 부모 페이지에 주차 이동을 알린다. 평소에는 아무 일도 하지 않는다. */
+/* 媛ㅻ윭由??덉뿉 ?ｌ쓣 ???embed=1)留??숈옉: 議곗옉 UI瑜??④린怨? ?꾨Ⅴ硫?遺紐??섏씠吏??二쇱감 ?대룞???뚮┛?? ?됱냼?먮뒗 ?꾨Т ?쇰룄 ?섏? ?딅뒗?? */
 (() => {
   const q = new URLSearchParams(location.search);
   if (!q.get("embed")) return;

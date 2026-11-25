@@ -75,7 +75,7 @@
  * HL: everything a figure may call. Read this index; the code under it is the
  * package's src/core, unchanged, and a figure should not need to read it.
  *
- * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * Every figure is drawn in a 400 횞 320 viewBox. World space is x/y on the
  * ground and z up. Plates are filled with the ground colour and painted back
  * to front, so a nearer one covers a farther one: append in that order. At
  * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
@@ -840,10 +840,10 @@ var HL = (() => {
       set textContent(value) { text = value == null ? "" : String(value); $("read").textContent = text; },
     };
 
-    document.title = "Hairline · " + figure.name;
+    document.title = "Hairline 쨌 " + figure.name;
     $("name").textContent = figure.name;
     $("means").textContent = figure.means;
-    $("rules").textContent = figure.rules.map((n) => String(n).padStart(2, "0") + " " + RULES[n - 1]).join(" · ");
+    $("rules").textContent = figure.rules.map((n) => String(n).padStart(2, "0") + " " + RULES[n - 1]).join(" 쨌 ");
     const show = () => { $("value").textContent = String(at(Number(slider.value))); };
     show();
 
@@ -881,51 +881,69 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-// Bear fills the canvas — small table, large bear
-const TABLE_W = 36, TABLE_D = 22, TABLE_H = 4, PB = 4;
+// Sitting teddy bear ??round chubby body, visible legs, big head
+const TABLE_W = 36, TABLE_D = 36, TABLE_H = 4, PB = 4;
 const SWAY = 6;
-const BASE_W = TABLE_W + PB * 2, BASE_D = TABLE_D + PB * 2;
-const CX = BASE_W / 2, CY = BASE_D / 2;
+const BASE_W = TABLE_W + PB * 2;  // 44
+const BASE_D = TABLE_D + PB * 2;  // 44
+const CX = BASE_W / 2;  // 22
+const CY = BASE_D / 2;  // 22
 
-// Large bear proportions
-const BW = 22, BD = 16, BH = 24;
-const HW = 18, HD = 15, HH = 20;
-const EW = 6.5, ED = 6.5, EH = 6;
-const AW = 9, AD = 6, AH = 4;
+const BW = 22, BD = 20, BH = 20;    // body ??round
+const HW = 20, HD = 18, HH = 20;    // head ??large and round
+const EW = 8,  ED = 8,  EH = 9;     // ears ??round balls
+const AW = 9,  AD = 6,  AH = 5;     // arms ??round stumps
+const LGW = 11, LGD = 10, LGH = 9;  // legs ??sitting stumps
+const SW = 11,  SD = 8;              // snout
 
-function drawBear(P, front, ox, bodyS, headS, earLS, earRS, armLS, armRS) {
+function drawBear(P, front, ox, legLS, legRS, bodyS, headS, earLS, earRS, armLS, armRS, snoutS) {
   const bcx = CX + ox;
 
-  // Body — large rounded oval
+  // Legs ??round stumps forward/below body (sitting pose)
+  const lgZ1 = TABLE_H, lgZ2 = TABLE_H + LGH;
+  const lgLx = bcx - LGW, lgLy = CY - BD / 2 - 5;
+  const [lglr, lgli] = rings(lgLx, lgLy, lgLx + LGW, lgLy + LGD, LGW / 2 * 0.86, 1.8);
+  put(legLS, prism(P, front, lglr, lgli, lgZ1, lgZ2));
+
+  const lgRx = bcx, lgRy = CY - BD / 2 - 7;
+  const [lgrr, lgri] = rings(lgRx, lgRy, lgRx + LGW, lgRy + LGD, LGW / 2 * 0.86, 1.8);
+  put(legRS, prism(P, front, lgrr, lgri, lgZ1, lgZ2));
+
+  // Body ??round chubby oval
   const bx0 = bcx - BW / 2, by0 = CY - BD / 2;
   const [br, bi] = rings(bx0, by0, bx0 + BW, by0 + BD, BW / 2 * 0.86, 2.2);
   put(bodyS, prism(P, front, br, bi, TABLE_H, TABLE_H + BH));
 
-  // Head — round, slightly smaller
+  // Head ??large round, overlaps body top
   const hx0 = bcx - HW / 2, hy0 = CY - HD / 2;
   const [hr, hi] = rings(hx0, hy0, hx0 + HW, hy0 + HD, HW / 2 * 0.86, 2.0);
-  put(headS, prism(P, front, hr, hi, TABLE_H + BH * 0.68, TABLE_H + BH + HH));
+  put(headS, prism(P, front, hr, hi, TABLE_H + BH * 0.65, TABLE_H + BH + HH));
   headS.sil.classList.add("hi");
 
-  // Left ear
-  const lx0 = bcx - HW * 0.08, ly0 = CY + HD * 0.20;
-  const [ler, lei] = rings(lx0, ly0, lx0 + EW, ly0 + ED, EW / 2 * 0.86, 0.6);
-  put(earLS, prism(P, front, ler, lei, TABLE_H + BH + HH * 0.48, TABLE_H + BH + HH + EH));
+  // Left ear ??round ball on top
+  const lx0 = bcx - HW * 0.08, ly0 = CY + HD * 0.22;
+  const [ler, lei] = rings(lx0, ly0, lx0 + EW, ly0 + ED, EW / 2 * 0.9, 0.7);
+  put(earLS, prism(P, front, ler, lei, TABLE_H + BH + HH * 0.45, TABLE_H + BH + HH + EH));
 
   // Right ear
-  const rx0 = bcx + HW * 0.08 - EW * 0.4, ry0 = CY - HD * 0.52;
-  const [rer, rei] = rings(rx0, ry0, rx0 + EW, ry0 + ED, EW / 2 * 0.86, 0.6);
-  put(earRS, prism(P, front, rer, rei, TABLE_H + BH + HH * 0.48, TABLE_H + BH + HH + EH));
+  const rx0 = bcx + HW * 0.1 - EW * 0.4, ry0 = CY - HD * 0.56;
+  const [rer, rei] = rings(rx0, ry0, rx0 + EW, ry0 + ED, EW / 2 * 0.9, 0.7);
+  put(earRS, prism(P, front, rer, rei, TABLE_H + BH + HH * 0.45, TABLE_H + BH + HH + EH));
 
-  // Left arm — stubby, low on body
+  // Snout ??oval muzzle protruding from front face
+  const snx0 = bcx - SW / 2, sny0 = CY - HD / 2 - 5;
+  const [snr, sni] = rings(snx0, sny0, snx0 + SW, sny0 + SD, 3.5, 1.8);
+  put(snoutS, prism(P, front, snr, sni, TABLE_H + BH * 0.72, TABLE_H + BH + HH * 0.35));
+
+  // Left arm
   const lax0 = bcx - BW / 2 - AW * 0.5, lay0 = CY - AD / 2 + 1;
-  const [lar, lai] = rings(lax0, lay0, lax0 + AW, lay0 + AD, 1.8, 1.0);
-  put(armLS, prism(P, front, lar, lai, TABLE_H + BH * 0.25, TABLE_H + BH * 0.25 + AH));
+  const [lar, lai] = rings(lax0, lay0, lax0 + AW, lay0 + AD, AW / 2 * 0.86, 1.2);
+  put(armLS, prism(P, front, lar, lai, TABLE_H + BH * 0.3, TABLE_H + BH * 0.3 + AH));
 
   // Right arm
   const rax0 = bcx + BW / 2 - AW * 0.5, ray0 = CY - AD / 2 - 1;
-  const [rar, rai] = rings(rax0, ray0, rax0 + AW, ray0 + AD, 1.8, 1.0);
-  put(armRS, prism(P, front, rar, rai, TABLE_H + BH * 0.25, TABLE_H + BH * 0.25 + AH));
+  const [rar, rai] = rings(rax0, ray0, rax0 + AW, ray0 + AD, AW / 2 * 0.86, 1.2);
+  put(armRS, prism(P, front, rar, rai, TABLE_H + BH * 0.3, TABLE_H + BH * 0.3 + AH));
 }
 
 function mount({ stage, svg, read }, value) {
@@ -947,14 +965,15 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  // Table — just a bit wider than the bear
   const [tr, ti] = rings(PB, PB, PB + TABLE_W, PB + TABLE_D, 5, 1.5);
   put(solid(g), prism(P, front, tr, ti, -PB, TABLE_H));
 
+  const legLS = solid(g), legRS = solid(g);
   const bodyS = solid(g), headS = solid(g);
   const earLS = solid(g), earRS = solid(g);
   const armLS = solid(g), armRS = solid(g);
-  drawBear(P, front, 0, bodyS, headS, earLS, earRS, armLS, armRS);
+  const snoutS = solid(g);
+  drawBear(P, front, 0, legLS, legRS, bodyS, headS, earLS, earRS, armLS, armRS, snoutS);
 
   let drawn = 0;
 
@@ -963,7 +982,7 @@ function mount({ stage, svg, read }, value) {
     const ox = sp.x;
     if (Math.abs(ox - drawn) < 0.03) return false;
     drawn = ox;
-    drawBear(P, front, ox, bodyS, headS, earLS, earRS, armLS, armRS);
+    drawBear(P, front, ox, legLS, legRS, bodyS, headS, earLS, earRS, armLS, armRS, snoutS);
     read.textContent = Math.abs(ox) > SWAY * 0.5 ? "swaying" : "still";
     return true;
   });
@@ -999,7 +1018,7 @@ hairline({
 });
 </script>
 <script id="gallery-embed">
-/* 갤러리 안에 넣을 때(?embed=1)만 동작: 조작 UI를 숨기고, 누르면 부모 페이지에 주차 이동을 알린다. 평소에는 아무 일도 하지 않는다. */
+/* 媛ㅻ윭由??덉뿉 ?ｌ쓣 ???embed=1)留??숈옉: 議곗옉 UI瑜??④린怨? ?꾨Ⅴ硫?遺紐??섏씠吏??二쇱감 ?대룞???뚮┛?? ?됱냼?먮뒗 ?꾨Т ?쇰룄 ?섏? ?딅뒗?? */
 (() => {
   const q = new URLSearchParams(location.search);
   if (!q.get("embed")) return;

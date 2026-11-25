@@ -75,7 +75,7 @@
  * HL: everything a figure may call. Read this index; the code under it is the
  * package's src/core, unchanged, and a figure should not need to read it.
  *
- * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
+ * Every figure is drawn in a 400 횞 320 viewBox. World space is x/y on the
  * ground and z up. Plates are filled with the ground colour and painted back
  * to front, so a nearer one covers a farther one: append in that order. At
  * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
@@ -840,10 +840,10 @@ var HL = (() => {
       set textContent(value) { text = value == null ? "" : String(value); $("read").textContent = text; },
     };
 
-    document.title = "Hairline · " + figure.name;
+    document.title = "Hairline 쨌 " + figure.name;
     $("name").textContent = figure.name;
     $("means").textContent = figure.means;
-    $("rules").textContent = figure.rules.map((n) => String(n).padStart(2, "0") + " " + RULES[n - 1]).join(" · ");
+    $("rules").textContent = figure.rules.map((n) => String(n).padStart(2, "0") + " " + RULES[n - 1]).join(" 쨌 ");
     const show = () => { $("value").textContent = String(at(Number(slider.value))); };
     show();
 
@@ -881,35 +881,48 @@ const {
   mk, pointer, put, register, disposer, solid,
 } = HL;
 
-// Record fills canvas — fit tightly around disc
+// Record fills canvas ??fit tightly around disc
 const DISC_D = 50, DISC_H = 14, PB = 4;
 const LABEL_D = 14, LABEL_H = 2.5;
 const NOTE_JUMP = 14;
 const PERIOD = 0.28;
 const CX = DISC_D / 2 + PB, CY = DISC_D / 2 + PB;
 
+// Notes: flat oval head + right-side stem + optional flag (??shape)
 const NOTE_POS = [
-  { rx: -14, ry: -8,  hw: 5,   hd: 4,  sh: 11 },
-  { rx:  2,  ry: -18, hw: 4.5, hd: 3.5, sh: 10 },
-  { rx:  16, ry:  -4, hw: 5,   hd: 4.5, sh: 12 },
-  { rx:  12, ry:  13, hw: 4.5, hd: 3.5, sh: 9  },
-  { rx:  -4, ry:  16, hw: 5,   hd: 4,  sh: 11 },
-  { rx: -17, ry:   6, hw: 4,   hd: 3.5, sh: 10 },
+  { rx: -14, ry: -8,  hw: 7,   hd: 3.5, sh: 14, flag: true  },
+  { rx:  2,  ry: -18, hw: 6.5, hd: 3.0, sh: 13, flag: false },
+  { rx:  16, ry:  -4, hw: 7,   hd: 3.5, sh: 15, flag: true  },
+  { rx:  12, ry:  13, hw: 6.5, hd: 3.0, sh: 12, flag: false },
+  { rx:  -4, ry:  16, hw: 7,   hd: 3.5, sh: 14, flag: true  },
+  { rx: -17, ry:   6, hw: 6.5, hd: 3.0, sh: 13, flag: false },
 ];
 const N_NOTES = NOTE_POS.length;
 
-function drawNote(P, front, np, oz, headS, stemS) {
+function drawNote(P, front, np, oz, headS, stemS, flagS) {
   const baseZ = DISC_H + LABEL_H;
   const hcx = CX + np.rx, hcy = CY + np.ry;
+
+  // Flat oval head ????note head shape
   const hx0 = hcx - np.hw / 2, hy0 = hcy - np.hd / 2;
-  const [hr, hi] = rings(hx0, hy0, hx0 + np.hw, hy0 + np.hd, np.hw / 2 * 0.86, 1.4);
-  put(headS, prism(P, front, hr, hi, baseZ + oz, baseZ + oz + 3));
+  const [hr, hi] = rings(hx0, hy0, hx0 + np.hw, hy0 + np.hd, np.hd / 2 * 0.95, 0.7);
+  put(headS, prism(P, front, hr, hi, baseZ + oz, baseZ + oz + 1.8));
   headS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
 
-  const sx0 = hcx - 0.9, sy0 = hcy - 0.9;
-  const [sr, si] = rings(sx0, sy0, sx0 + 1.8, sy0 + 1.8, 0.5, 0.4);
-  put(stemS, prism(P, front, sr, si, baseZ + oz + 3, baseZ + oz + 3 + np.sh));
+  // Stem ??right edge of head, tall and thin
+  const stemX = hcx + np.hw / 2 - 1.5, stemY = hcy - 0.6;
+  const [sr, si] = rings(stemX, stemY, stemX + 1.4, stemY + 1.2, 0.35, 0.3);
+  put(stemS, prism(P, front, sr, si, baseZ + oz + 1.8, baseZ + oz + 1.8 + np.sh));
   stemS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
+
+  // Flag ??small curved tab at top of stem for ??eighth notes
+  if (flagS) {
+    const topZ = baseZ + oz + 1.8 + np.sh;
+    const fX = stemX + 0.8, fY = stemY + 0.5;
+    const [fr, fi] = rings(fX, fY, fX + 5.5, fY + 2.5, 1.2, 0.6);
+    put(flagS, prism(P, front, fr, fi, topZ - 3.5, topZ));
+    flagS.sil.classList.toggle("hi", oz > NOTE_JUMP * 0.4);
+  }
 }
 
 function mount({ stage, svg, read }, value) {
@@ -927,7 +940,7 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
 
-  // Record disc — large, hi class
+  // Record disc
   const dx0 = CX - DISC_D / 2, dy0 = CY - DISC_D / 2;
   const [dr, di] = rings(dx0, dy0, dx0 + DISC_D, dy0 + DISC_D, DISC_D / 2, 4.5);
   const discS = solid(g);
@@ -939,11 +952,12 @@ function mount({ stage, svg, read }, value) {
   const [lr, li] = rings(lx0, ly0, lx0 + LABEL_D, ly0 + LABEL_D, LABEL_D / 2, 1.6);
   put(solid(g), prism(P, front, lr, li, DISC_H, DISC_H + LABEL_H));
 
-  // Musical notes
+  // Musical notes ????and ??alternating
   const notes = NOTE_POS.map(np => {
     const headS = solid(g), stemS = solid(g);
-    drawNote(P, front, np, 0, headS, stemS);
-    return { np, headS, stemS, sp: spring(0, { k: 80, c: 14, eps: 0.05 }), drawn: 0 };
+    const flagS = np.flag ? solid(g) : null;
+    drawNote(P, front, np, 0, headS, stemS, flagS);
+    return { np, headS, stemS, flagS, sp: spring(0, { k: 80, c: 14, eps: 0.05 }), drawn: 0 };
   });
 
   const B = register(stage, (dt) => {
@@ -958,7 +972,7 @@ function mount({ stage, svg, read }, value) {
       const oz = n.sp.x;
       if (Math.abs(oz - n.drawn) < 0.03) continue;
       n.drawn = oz;
-      drawNote(P, front, n.np, oz, n.headS, n.stemS);
+      drawNote(P, front, n.np, oz, n.headS, n.stemS, n.flagS);
     }
     return m || over;
   });
@@ -982,7 +996,7 @@ function mount({ stage, svg, read }, value) {
 
 hairline({
   name: "record",
-  means: "A vinyl record with musical notes — hover to watch them jump up in sequence.",
+  means: "A vinyl record with musical notes ??hover to watch them jump up in sequence.",
   rules: [1, 4, 5, 7, 8, 9],
   range: [4, 7, 10],
   tour: [[200, 100], [200, 162], [170, 185], null],
@@ -990,7 +1004,7 @@ hairline({
 });
 </script>
 <script id="gallery-embed">
-/* 갤러리 안에 넣을 때(?embed=1)만 동작: 조작 UI를 숨기고, 누르면 부모 페이지에 주차 이동을 알린다. 평소에는 아무 일도 하지 않는다. */
+/* 媛ㅻ윭由??덉뿉 ?ｌ쓣 ???embed=1)留??숈옉: 議곗옉 UI瑜??④린怨? ?꾨Ⅴ硫?遺紐??섏씠吏??二쇱감 ?대룞???뚮┛?? ?됱냼?먮뒗 ?꾨Т ?쇰룄 ?섏? ?딅뒗?? */
 (() => {
   const q = new URLSearchParams(location.search);
   if (!q.get("embed")) return;
